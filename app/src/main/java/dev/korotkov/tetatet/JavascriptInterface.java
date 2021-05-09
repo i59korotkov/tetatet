@@ -2,15 +2,15 @@ package dev.korotkov.tetatet;
 
 public class JavascriptInterface {
 
-    OldCallActivity oldCallActivity;
+    CallActivity callActivity;
 
-    public JavascriptInterface(OldCallActivity oldCallActivity) {
-        this.oldCallActivity = oldCallActivity;
+    public JavascriptInterface(CallActivity callActivity) {
+        this.callActivity = callActivity;
     }
 
     @android.webkit.JavascriptInterface
     public void onPeerConnected() {
-        oldCallActivity.onPeerConnected();
+        callActivity.onPeerConnected();
     }
 
 }

@@ -2,9 +2,12 @@ package dev.korotkov.tetatet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.animation.LayoutTransition;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -26,6 +29,11 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 public class LoginActivity extends AppCompatActivity {
+
+    String[] permissions = {
+            Manifest.permission.RECORD_AUDIO
+    };
+    int requestCode = 1;
 
     FirebaseAuth firebaseAuth;
 
@@ -59,7 +67,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // If the user is already logged in, than skip this activity
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            startActivity(new Intent(this, OldCallActivity.class));
+            startActivity(new Intent(this, CallActivity.class));
             finish();
         }
     }
@@ -70,6 +78,11 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         startBackgroundAnimation();
+
+        // Check permissions
+        if (!isPermissionGranted()) {
+            askPermission();
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -102,6 +115,21 @@ public class LoginActivity extends AppCompatActivity {
 
         startLoginLayoutListeners();
         startRegisterLayoutListeners();
+    }
+
+    private void askPermission() {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+    }
+
+    private boolean isPermissionGranted() {
+
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void startLoginLayoutListeners() {
@@ -170,7 +198,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        startActivity(new Intent(LoginActivity.this, OldCallActivity.class));
+                        startActivity(new Intent(LoginActivity.this, CallActivity.class));
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -246,7 +274,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        startActivity(new Intent(LoginActivity.this, OldCallActivity.class));
+                        startActivity(new Intent(LoginActivity.this, CallActivity.class));
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {

@@ -94,10 +94,6 @@ public class OldCallActivity extends AppCompatActivity {
         callBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(android.view.View v) {
-                // TODO: Remove
-                startActivity(new Intent(OldCallActivity.this, RegisterActivity.class));
-                if (true) return;
-
                 friendsUsername = friendsNameEdit.getText().toString();
                 sendCallRequest();
             }
@@ -178,7 +174,7 @@ public class OldCallActivity extends AppCompatActivity {
 
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-        webView.addJavascriptInterface(new JavascriptInterface(this), "Android");
+        //webView.addJavascriptInterface(new JavascriptInterface(this), "Android");
 
         loadCall();
     }

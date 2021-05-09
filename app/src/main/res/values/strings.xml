@@ -3,4 +3,7 @@
     <string name="register_to_login">Already have an account? <u>Log in</u></string>
     <string name="login_to_register">Don\'t have an account yet? <u>Register</u></string>
     <string name="login_reset_password"><u>Reset password</u></string>
+    <string-array name="emojis">
+        <item>0x1F642</item>
+    </string-array>
 </resources>

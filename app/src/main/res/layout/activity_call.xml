@@ -1,9 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".CallActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Call"
+            android:id="@+id/call_call_btn"/>
+
+    </LinearLayout>
+
+    <WebView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:id="@+id/call_webview" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/call_main_relative">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:textSize="128dp"
+            android:textColor="#ff000000"
+            android:text="🙂"
+            android:background="@drawable/emoji_form"
+            android:id="@+id/call_current_user_emoji" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/call_current_user_emoji"
+            android:layout_marginTop="16dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="You"
+            android:id="@+id/call_current_user_text"/>
+
+        <View
+            android:layout_width="256dp"
+            android:layout_height="1dp"
+            android:layout_below="@id/call_current_user_text"
+            android:layout_marginVertical="16dp"
+            android:background="@color/grey"
+            android:id="@+id/call_line" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/call_line"
+            android:layout_centerHorizontal="true"
+            android:textSize="128dp"
+            android:textColor="#ff000000"
+            android:text="🙂"
+            android:background="@drawable/emoji_form"
+            android:id="@+id/call_another_user_emoji" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/call_another_user_emoji"
+            android:layout_marginTop="16dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="Name"
+            android:id="@+id/call_another_user_text"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:background="@drawable/rounded_all_white_background"
+        android:elevation="64dp">
+
+        <Chronometer
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:textSize="32dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:textSize="64dp"
+            android:textColor="#ff000000"
+            android:text="👋" />
+
+    </RelativeLayout>
+
+</RelativeLayout>
