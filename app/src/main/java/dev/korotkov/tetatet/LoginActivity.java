@@ -285,7 +285,6 @@ public class LoginActivity extends AppCompatActivity {
                         } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             registerEmailEditText.setError("Incorrect email format");
                         } else {
-                            //Toast.makeText(RegisterActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                             Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
                         }
 

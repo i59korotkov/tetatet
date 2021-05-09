@@ -1,30 +1,20 @@
 package dev.korotkov.tetatet;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
+import android.app.Dialog;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
 
 public class RegisterActivity extends AppCompatActivity {
+
+    TextView registerAvatarBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,19 +23,51 @@ public class RegisterActivity extends AppCompatActivity {
 
         startBackgroundAnimation();
 
-        ListView listView = findViewById(R.id.register_interests_list);
-        final String[] catNames = new String[] {
-                "Рыжик", "Барсик", "Мурзик", "Мурка", "Васька",
-                "Томасина", "Кристина", "Пушок", "Дымка", "Кузя",
-                "Китти", "Масяня", "Симба"
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, catNames);
-        listView.setAdapter(adapter);
+        registerAvatarBtn = (TextView) findViewById(R.id.register_avatar_btn);
+
+        registerAvatarBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDialogAvatarChoice();
+            }
+        });
+    }
+
+    private void showDialogAvatarChoice() {
+        // Create dialog from layout
+        Dialog dialog = new Dialog(RegisterActivity.this);
+        dialog.setContentView(R.layout.dialog_avatar_choice);
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_background));
+
+        // Populate avatar list with emojis from resources
+        ListView avatarList = dialog.findViewById(R.id.dialog_avatar_list);
+        final String[] avatars = getResources().getStringArray(R.array.avatar_emojis);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(RegisterActivity.this, android.R.layout.simple_list_item_1, avatars);
+        avatarList.setAdapter(adapter);
+
+        // Show dialog
+        dialog.show();
+
+        avatarList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Choose clicked avatar
+                TextView registerAvatarEmoji= findViewById(R.id.register_avatar_emoji);
+                TextView registerAvatarBtn = findViewById(R.id.register_avatar_btn);
+
+                registerAvatarEmoji.setVisibility(View.VISIBLE);
+                registerAvatarEmoji.setText(avatars[position]);
+                registerAvatarBtn.setText("Change avatar");
+
+                // Close dialog
+                dialog.dismiss();
+            }
+        });
     }
 
     private void startBackgroundAnimation() {
         // Background gradient animation
-        LinearLayout registerLayout = findViewById(R.id.register_layout);
+        ScrollView registerLayout = findViewById(R.id.register_layout);
         AnimationDrawable animationDrawable = (AnimationDrawable) registerLayout.getBackground();
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(4000);

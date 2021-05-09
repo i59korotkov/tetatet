@@ -14,15 +14,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tetatet"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CallActivity"></activity>
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity">
+        <activity android:name=".CallActivity" />
+        <activity android:name=".RegisterActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".LoginActivity"></activity>
         <activity android:name=".OldCallActivity" />
         <activity android:name=".MainActivity" />
     </application>

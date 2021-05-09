@@ -3,6 +3,7 @@ package dev.korotkov.tetatet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.PermissionRequest;
@@ -73,6 +74,9 @@ public class CallActivity extends AppCompatActivity {
         // Show big emojis
         //findViewById(R.id.call_current_user_emoji).setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         //findViewById(R.id.call_another_user_emoji).setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+        // Set volume controls to music
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         currentUserEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
