@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/rounded_all_white_background"
+    android:background="@drawable/rounded_all_white_smaller_radius_background"
     android:paddingHorizontal="32dp"
     android:paddingBottom="32dp"
     android:orientation="vertical"
-    android:id="@+id/dialog_list_choice">
+    android:id="@+id/dialog_list_single_choice">
 
     <TextView
         android:layout_width="match_parent"
@@ -18,12 +18,12 @@
         android:textColor="@color/grey"
         android:fontFamily="sans-serif-medium"
         android:text="Title"
-        android:id="@+id/dialog_list_choice_title"/>
+        android:id="@+id/dialog_list_single_choice_title"/>
 
     <ListView
-        android:layout_width="match_parent"
+        android:layout_width="256dp"
         android:layout_height="256dp"
         android:layout_marginTop="16dp"
-        android:id="@+id/dialog_list_choice_list"/>
+        android:id="@+id/dialog_list_single_choice_list"/>
 
 </LinearLayout>
