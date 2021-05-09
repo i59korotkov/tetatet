@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "432558968103",
+    "project_id": "tetatet-d25ca",
+    "storage_bucket": "tetatet-d25ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:432558968103:android:a92636ba2700c116df2d02",
+        "android_client_info": {
+          "package_name": "dev.korotkov.tetatet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "432558968103-0c9fshh6jvte21k2femitor8bb96q4ai.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCK_L2nFMRN0KXP6gpNll04kOY8GmJAof0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "432558968103-0c9fshh6jvte21k2femitor8bb96q4ai.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

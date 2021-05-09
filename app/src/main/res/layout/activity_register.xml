@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_list"
+    android:padding="32dp"
+    android:id="@+id/register_layout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="32dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_all_white_background">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="Tell us about you" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:id="@+id/register_name_layout">
+
+            <TextView
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="Name"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/rounded_grey_stroke"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/grey"
+                android:textSize="16dp"
+                android:hint="Name"
+                android:id="@+id/register_name"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:id="@+id/register_age_layout">
+
+            <TextView
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="Age"/>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="4dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/rounded_grey_stroke"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/grey"
+                android:textSize="16dp"
+                android:hint="Age"
+                android:id="@+id/register_age"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp"
+            android:id="@+id/register_sex_layout">
+
+            <TextView
+                android:layout_width="64dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:textSize="16dp"
+                android:text="Sex"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="32dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_all_white_background"
+        android:id="@+id/register_description_layout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="About me" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="128dp"
+            android:layout_marginTop="16dp"
+            android:padding="8dp"
+            android:background="@drawable/rounded_rectangle_grey_stroke"
+            android:textColorHint="@color/grey"
+            android:textColor="@color/grey"
+            android:textSize="16dp"
+            android:gravity="top"
+            android:hint="A few sentences about yourself (optional)"
+            android:id="@+id/register_description"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:paddingHorizontal="32dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="32dp"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_all_white_background"
+        android:id="@+id/register_interests_layout">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-black"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="Interests" />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/register_interests_list" />
+
+    </LinearLayout>
+
+</LinearLayout>
