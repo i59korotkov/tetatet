@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.animation.LayoutTransition;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
@@ -13,9 +14,12 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -166,7 +170,7 @@ public class LoginActivity extends AppCompatActivity {
                 // Send email to reset password
                 firebaseAuth.sendPasswordResetEmail(email);
 
-                Toast.makeText(LoginActivity.this, "Check your email address for instructions", Toast.LENGTH_LONG).show();
+                makeDialogInfo("Password reset", "An email with instructions was sent to your address");
             }
         });
 
@@ -209,8 +213,7 @@ public class LoginActivity extends AppCompatActivity {
                         } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             loginPasswordEditText.setError("Wrong password");
                         } else {
-                            //Toast.makeText(LoginActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
-                            Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                            makeDialogInfo("Error", "Something went wrong");
                         }
 
                         // Show login button
@@ -285,13 +288,37 @@ public class LoginActivity extends AppCompatActivity {
                         } else if (e instanceof FirebaseAuthInvalidCredentialsException) {
                             registerEmailEditText.setError("Incorrect email format");
                         } else {
-                            Toast.makeText(LoginActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+                            makeDialogInfo("Error", "Something went wrong");
                         }
 
                         // Show register button
                         registerButton.setVisibility(View.VISIBLE);
                     }
                 });
+            }
+        });
+    }
+
+    private void makeDialogInfo(String title, String description) {
+        // Create dialog from layout
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_info);
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
+
+        // Change the title
+        ((TextView) dialog.findViewById(R.id.dialog_info_title)).setText(title);
+
+        // Change description
+        ((TextView) dialog.findViewById(R.id.dialog_info_description)).setText(description);
+
+        // Show dialog
+        dialog.show();
+
+        dialog.findViewById(R.id.dialog_info_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Close dialog
+                dialog.dismiss();
             }
         });
     }

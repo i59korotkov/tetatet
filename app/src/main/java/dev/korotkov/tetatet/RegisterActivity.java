@@ -36,11 +36,14 @@ public class RegisterActivity extends AppCompatActivity {
     private void showDialogAvatarChoice() {
         // Create dialog from layout
         Dialog dialog = new Dialog(RegisterActivity.this);
-        dialog.setContentView(R.layout.dialog_avatar_choice);
-        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_background));
+        dialog.setContentView(R.layout.dialog_list_choice);
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
+
+        // Change the title
+        ((TextView) dialog.findViewById(R.id.dialog_list_choice_title)).setText("Choose your avatar");
 
         // Populate avatar list with emojis from resources
-        ListView avatarList = dialog.findViewById(R.id.dialog_avatar_list);
+        ListView avatarList = dialog.findViewById(R.id.dialog_list_choice_list);
         final String[] avatars = getResources().getStringArray(R.array.avatar_emojis);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(RegisterActivity.this, android.R.layout.simple_list_item_1, avatars);
         avatarList.setAdapter(adapter);

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_all_white_smaller_radius_background"
+    android:paddingHorizontal="32dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical"
+    android:id="@+id/dialog_avatar_choice">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textAlignment="center"
+        android:textSize="24dp"
+        android:textColor="@color/grey"
+        android:fontFamily="sans-serif-medium"
+        android:text="Info"
+        android:id="@+id/dialog_info_title"/>
+
+    <TextView
+        android:layout_width="256dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="16dp"
+        android:text="Description"
+        android:id="@+id/dialog_info_description"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="16dp"
+        android:paddingVertical="6dp"
+        android:paddingHorizontal="16dp"
+        android:background="@drawable/rounded_rectangle_grey_stroke"
+        android:backgroundTint="@color/blue"
+        android:textAlignment="center"
+        android:textSize="16dp"
+        android:textColor="@color/white"
+        android:text="Ok"
+        android:id="@+id/dialog_info_btn"/>
+
+</LinearLayout>
