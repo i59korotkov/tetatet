@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/grey"
-                android:textSize="32dp"
+                android:textSize="24dp"
                 android:text="Tell us about you" />
 
             <LinearLayout
@@ -85,6 +85,7 @@
                     android:textColorHint="@color/grey"
                     android:textColor="@color/grey"
                     android:textSize="16dp"
+                    android:inputType="number"
                     android:hint="Age"
                     android:id="@+id/register_age"/>
 
@@ -148,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/grey"
-                android:textSize="32dp"
+                android:textSize="24dp"
                 android:text="About me" />
 
             <EditText
@@ -183,12 +184,14 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/grey"
-                android:textSize="32dp"
+                android:textSize="24dp"
                 android:text="Interests" />
 
-            <ListView
+            <dev.korotkov.tetatet.NonScrollListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:listSelector="@android:color/transparent"
                 android:id="@+id/register_chosen_interests_list"/>
 
             <TextView
@@ -199,6 +202,7 @@
                 android:paddingHorizontal="16dp"
                 android:background="@drawable/rounded_rectangle_grey_stroke"
                 android:backgroundTint="@color/blue"
+                android:textAlignment="center"
                 android:textSize="16dp"
                 android:textColor="@color/white"
                 android:text="Choose your interests"
@@ -223,12 +227,14 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/grey"
-                android:textSize="32dp"
+                android:textSize="24dp"
                 android:text="Languages" />
 
-            <ListView
+            <dev.korotkov.tetatet.NonScrollListView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:listSelector="@android:color/transparent"
                 android:id="@+id/register_chosen_languages_list"/>
 
             <TextView
@@ -239,6 +245,7 @@
                 android:paddingHorizontal="16dp"
                 android:background="@drawable/rounded_rectangle_grey_stroke"
                 android:backgroundTint="@color/blue"
+                android:textAlignment="center"
                 android:textSize="16dp"
                 android:textColor="@color/white"
                 android:text="Choose your languages"
@@ -250,8 +257,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
-            android:paddingTop="32dp"
-            android:paddingBottom="48dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="50dp"
             android:animateLayoutChanges="true"
             android:background="@drawable/rounded_top_white_background">
 
@@ -264,12 +271,21 @@
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="32dp"
+                android:layout_marginHorizontal="16dp"
                 android:background="@drawable/rounded_grey_stroke"
                 android:textSize="16dp"
                 android:fontFamily="sans-serif-black"
                 android:text="Finish registration"
                 android:id="@+id/register_btn"/>
+
+            <TextView
+                android:layout_below="@id/register_btn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Account information can be changed later" />
+
 
         </RelativeLayout>
 

@@ -23,6 +23,9 @@
         android:layout_width="256dp"
         android:layout_height="256dp"
         android:layout_marginTop="16dp"
+        android:listSelector="@android:color/transparent"
+        android:dividerHeight="4dp"
+        android:divider="@android:color/transparent"
         android:id="@+id/dialog_list_multiple_choice_list"/>
 
     <TextView
@@ -30,13 +33,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="16dp"
-        android:paddingVertical="6dp"
-        android:paddingHorizontal="16dp"
-        android:background="@drawable/rounded_rectangle_grey_stroke"
-        android:backgroundTint="@color/blue"
         android:textAlignment="center"
-        android:textSize="16dp"
-        android:textColor="@color/white"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20dp"
+        android:textColor="@color/blue"
         android:text="Ok"
         android:id="@+id/dialog_list_multiple_choice_btn"/>
 

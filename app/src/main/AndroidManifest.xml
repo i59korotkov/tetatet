@@ -14,19 +14,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tetatet"
         android:usesCleartextTraffic="true">
-        <activity android:name=".CallActivity" />
-        <activity android:name=".RegisterActivity">
+        <activity android:name=".CallActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".RegisterActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity">
+        <activity android:name=".LoginActivity"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
-        <activity android:name=".OldCallActivity" />
-        <activity android:name=".MainActivity" />
+        <activity android:name=".OldCallActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>

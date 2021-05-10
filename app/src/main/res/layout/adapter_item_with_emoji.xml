@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:tag="false"
+    android:background="@drawable/rounded_all_white_smaller_radius_background"
+    android:id="@+id/adapter_item_with_emoji_layout">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="8dp"
+        android:textSize="16dp"
+        android:textColor="#ff000000"
+        android:text="🏀"
+        android:id="@+id/adapter_item_with_emoji_emoji" />
+
+    <TextView
+        android:layout_below="@+id/adapter_item_with_emoji_emoji"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textColor="@color/grey"
+        android:text="Basketball"
+        android:id="@+id/adapter_item_with_emoji_name" />
+
+</LinearLayout>

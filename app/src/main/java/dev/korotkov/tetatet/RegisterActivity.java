@@ -1,38 +1,31 @@
 package dev.korotkov.tetatet;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.Dialog;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.ThrowOnExtraProperties;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.Arrays;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -42,11 +35,22 @@ public class RegisterActivity extends AppCompatActivity {
     String userId;
 
     TextView registerAvatarBtn;
-    TextView registerInterestsBtn;
 
-    // Interests map loaded from firebase
-    HashMap<String, String> interests = new HashMap<>();
-    HashMap<String, String> chosenInterests = new HashMap<>();
+    // Interests
+    TextView registerInterestsBtn;
+    ListView chosenInterestsListView;
+    ItemWithEmojiAdapter interestAdapter;
+
+    ArrayList<ItemWithEmoji> interests = new ArrayList<>();
+    ArrayList<ItemWithEmoji> chosenInterests = new ArrayList<>();
+
+    // Languages
+    TextView registerLanguagesBtn;
+    ListView chosenLanguagesListView;
+    ItemWithEmojiAdapter languagesAdapter;
+
+    ArrayList<ItemWithEmoji> languages = new ArrayList<>();
+    ArrayList<ItemWithEmoji> chosenLanguages = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +66,21 @@ public class RegisterActivity extends AppCompatActivity {
 
         registerAvatarBtn = (TextView) findViewById(R.id.register_avatar_btn);
         registerInterestsBtn = (TextView) findViewById(R.id.register_interests_btn);
+        registerLanguagesBtn = (TextView) findViewById(R.id.register_languages_btn);
 
-        loadInterestsMapFromDatabase();
+        chosenInterestsListView = (ListView) findViewById(R.id.register_chosen_interests_list);
+        chosenLanguagesListView = (ListView) findViewById(R.id.register_chosen_languages_list);
+
+        loadInterestsFromDatabase();
+        loadLanguagesFromDatabase();
+
+        // Set adapter for chosen interests
+        interestAdapter = new ItemWithEmojiAdapter(RegisterActivity.this, R.layout.adapter_item_with_emoji, chosenInterests);
+        chosenInterestsListView.setAdapter(interestAdapter);
+
+        // Set adapter for chosen languages
+        languagesAdapter = new ItemWithEmojiAdapter(RegisterActivity.this, R.layout.adapter_item_with_emoji, chosenLanguages);
+        chosenLanguagesListView.setAdapter(languagesAdapter);
 
         registerAvatarBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -75,23 +92,175 @@ public class RegisterActivity extends AppCompatActivity {
         registerInterestsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDialogInterestsChoice();
+                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(RegisterActivity.this, R.layout.adapter_item_with_emoji, interests);
+
+                // Show dialog windows and set items clickable
+                showDialogMultipleChoice(adapter, "Choose your interests").setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        boolean chosen = chosenInterests.contains(interests.get(position));
+
+                        chosen = !chosen;
+                        view.setTag(chosen?"true":"false");
+
+                        if (chosen) {
+                            chosenInterests.add(interests.get(position));
+                            view.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.blue)));
+                        } else {
+                            chosenInterests.remove(interests.get(position));
+                            view.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+                        }
+
+                        // Update chosen interests
+                        interestAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        });
+
+        registerLanguagesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(RegisterActivity.this, R.layout.adapter_item_with_emoji, languages);
+
+                // Show dialog windows and set items clickable
+                showDialogMultipleChoice(adapter, "Choose your languages").setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        boolean chosen = chosenLanguages.contains(languages.get(position));
+
+                        chosen = !chosen;
+                        view.setTag(chosen?"true":"false");
+
+                        if (chosen) {
+                            chosenLanguages.add(languages.get(position));
+                            view.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.blue)));
+                        } else {
+                            chosenLanguages.remove(languages.get(position));
+                            view.setBackgroundTintList(ColorStateList.valueOf(getColor(R.color.white)));
+                        }
+
+                        // Update chosen interests
+                        languagesAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
     }
 
-    private void loadInterestsMapFromDatabase() {
+    // TODO: Remove
+    private void populateAvatars() {
+        ArrayList<String> avatarsList = new ArrayList<String>(Arrays.asList(
+                "👶 Baby",
+                "🧒 Child",
+                "👦 Boy",
+                "👧 Girl",
+                "🧑 Person",
+                "👱 Person: Blond Hair",
+                "👨 Man",
+                "🧔 Person: Beard",
+                "👨‍🦰 Man: Red Hair",
+                "👨‍🦱 Man: Curly Hair",
+                "👨‍🦳 Man: White Hair",
+                "👨‍🦲 Man: Bald",
+                "👩 Woman",
+                "👩‍🦰 Woman: Red Hair",
+                "🧑‍🦰 Person: Red Hair",
+                "👩‍🦱 Woman: Curly Hair",
+                "🧑‍🦱 Person: Curly Hair",
+                "👩‍🦳 Woman: White Hair",
+                "🧑‍🦳 Person: White Hair",
+                "👩‍🦲 Woman: Bald",
+                "🧑‍🦲 Person: Bald",
+                "👱‍♀️ Woman: Blond Hair",
+                "👱‍♂️ Man: Blond Hair",
+                "🧓 Older Person",
+                "👴 Old Man",
+                "👵 Old Woman",
+                "🧑‍⚕️ Health Worker",
+                "👨‍⚕️ Man Health Worker",
+                "👩‍⚕️ Woman Health Worker",
+                "🧑‍🎓 Student",
+                "👨‍🎓 Man Student",
+                "👩‍🎓 Woman Student",
+                "🧑‍🏫 Teacher",
+                "👨‍🏫 Man Teacher",
+                "👩‍🏫 Woman Teacher",
+                "🧑‍⚖️ Judge",
+                "👨‍⚖️ Man Judge",
+                "👩‍⚖️ Woman Judge",
+                "🧑‍🌾 Farmer",
+                "👨‍🌾 Man Farmer",
+                "👩‍🌾 Woman Farmer",
+                "🧑‍🍳 Cook",
+                "👨‍🍳 Man Cook",
+                "👩‍🍳 Woman Cook",
+                "🧑‍🔧 Mechanic",
+                "👨‍🔧 Man Mechanic",
+                "👩‍🔧 Woman Mechanic",
+                "🧑‍🏭 Factory Worker",
+                "👨‍🏭 Man Factory Worker",
+                "👩‍🏭 Woman Factory Worker",
+                "🧑‍💼 Office Worker",
+                "👨‍💼 Man Office Worker",
+                "👩‍💼 Woman Office Worker",
+                "🧑‍🔬 Scientist",
+                "👨‍🔬 Man Scientist",
+                "👩‍🔬 Woman Scientist",
+                "🧑‍💻 Technologist",
+                "👨‍💻 Man Technologist",
+                "👩‍💻 Woman Technologist",
+                "🧑‍🎤 Singer",
+                "👨‍🎤 Man Singer",
+                "👩‍🎤 Woman Singer",
+                "🧑‍🎨 Artist",
+                "👨‍🎨 Man Artist",
+                "👩‍🎨 Woman Artist",
+                "🧑‍✈️ Pilot",
+                "👨‍✈️ Man Pilot",
+                "👩‍✈️ Woman Pilot",
+                "🧑‍🚀 Astronaut",
+                "👨‍🚀 Man Astronaut",
+                "👩‍🚀 Woman Astronaut",
+                "🧑‍🚒 Firefighter",
+                "👨‍🚒 Man Firefighter",
+                "👩‍🚒 Woman Firefighter",
+                "👮 Police Officer",
+                "👮‍♂️ Man Police Officer",
+                "👮‍♀️ Woman Police Officer",
+                "🕵️ Detective",
+                "🕵️‍♂️ Man Detective",
+                "🕵️‍♀️ Woman Detective",
+                "💂 Guard",
+                "💂‍♂️ Man Guard",
+                "💂‍♀️ Woman Guard",
+                "👷 Construction Worker",
+                "👷‍♂️ Man Construction Worker",
+                "👷‍♀️ Woman Construction Worker",
+                "🤴 Prince",
+                "👸 Princess",
+                "👳 Person Wearing Turban",
+                "👳‍♂️ Man Wearing Turban",
+                "👳‍♀️ Woman Wearing Turban",
+                "👲 Person With Skullcap",
+                "🧕 Woman with Headscarf",
+                "🤵 Person in Tuxedo",
+                "🤵‍♂️ Man in Tuxedo",
+                "🤵‍♀️ Woman in Tuxedo",
+                "👰 Person With Veil",
+                "👰‍♂️ Man with Veil",
+                "👰‍♀️ Woman with Veil"
+        ));
+    }
+
+    private void loadInterestsFromDatabase() {
         firebaseFirestore.collection("interests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
                     for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        String interestEmoji = document.get("emoji").toString();
-                        String interestName = document.get("name").toString();
-
-                        interests.put(document.getId(), interestEmoji + " " + interestName);
+                        interests.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
                     }
-
                 } else {
                     makeDialogInfo("Error", "Cannot get interests list from database");
                     Log.i("INTERESTS", task.getException().getMessage());
@@ -100,34 +269,37 @@ public class RegisterActivity extends AppCompatActivity {
         });
     }
 
-    private void showDialogInterestsChoice() {
+    private void loadLanguagesFromDatabase() {
+        firebaseFirestore.collection("languages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        languages.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
+                    }
+                } else {
+                    makeDialogInfo("Error", "Cannot get languages list from database");
+                    Log.i("LANGUAGES", task.getException().getMessage());
+                }
+            }
+        });
+    }
+
+    private ListView showDialogMultipleChoice(ListAdapter adapter, String title) {
         // Create dialog from layout
         Dialog dialog = new Dialog(RegisterActivity.this);
         dialog.setContentView(R.layout.dialog_list_multiple_choice);
         dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
 
         // Change the title
-        ((TextView) dialog.findViewById(R.id.dialog_list_multiple_choice_title)).setText("Choose your interests");
+        ((TextView) dialog.findViewById(R.id.dialog_list_multiple_choice_title)).setText(title);
 
-        // Populate interests list
-        ListView interestsViewList = dialog.findViewById(R.id.dialog_list_multiple_choice_list);
-
-        // Get all interests names from interests map
-        String[] interestsList = new String[interests.size()];
-        interests.values().toArray(interestsList);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(RegisterActivity.this, android.R.layout.simple_list_item_1, interestsList);
-        interestsViewList.setAdapter(adapter);
+        // Set adapter view
+        ListView listView = dialog.findViewById(R.id.dialog_list_multiple_choice_list);
+        listView.setAdapter(adapter);
 
         // Show dialog
         dialog.show();
-
-        interestsViewList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-        });
 
         dialog.findViewById(R.id.dialog_list_multiple_choice_btn).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +308,8 @@ public class RegisterActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        return listView;
     }
 
     private void showDialogAvatarChoice() {
