@@ -147,19 +147,6 @@
                 android:textColorHint="@color/grey"
                 android:textColor="@color/grey"
                 android:textSize="16dp"
-                android:hint="Your name"
-                android:id="@+id/register_username"/>
-
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:paddingVertical="4dp"
-                android:paddingHorizontal="16dp"
-                android:background="@drawable/rounded_grey_stroke"
-                android:textColorHint="@color/grey"
-                android:textColor="@color/grey"
-                android:textSize="16dp"
                 android:inputType="textPassword"
                 android:hint="Password"
                 android:id="@+id/register_password"/>

@@ -1,27 +1,16 @@
 package dev.korotkov.tetatet;
 
-public class ItemWithEmoji {
+public class ItemWithEmoji extends Emoji {
 
-    private String id;
     private String name;
-    private String emoji;
 
     public ItemWithEmoji(String id, String name, String emoji) {
-        this.id = id;
+        super(id, emoji);
         this.name = name;
-        this.emoji = emoji;
-    }
-
-    public String getId() {
-        return id;
     }
 
     public String getName() {
         return name;
-    }
-
-    public String getEmoji() {
-        return emoji;
     }
 
 }
