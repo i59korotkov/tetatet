@@ -3,13 +3,16 @@ package dev.korotkov.tetatet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.PermissionRequest;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,16 +51,19 @@ public class CallActivity extends AppCompatActivity {
     TextView otherUserEmoji;
     TextView otherUserText;
 
-    boolean isAnotherUserMuted = false;
+    boolean isOtherUserMuted = false;
 
     // Emoji codes
     int emojiSmileClosed = 0x1F642;
+    int emojiSmileOpened = 0x1F600;
     int emojiZipped = 0x1F910;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_call);
+
+        startBackgroundAnimation();
 
         firebaseRef = FirebaseDatabase.getInstance().getReference("calls");
 
@@ -113,6 +119,28 @@ public class CallActivity extends AppCompatActivity {
         });
 
         setupWebView();
+
+        startSoundCheckRunnable();
+    }
+
+    private void startSoundCheckRunnable() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    if (callId != null) {
+                        callJavascriptFunction("javascript:getLocalLevel()");
+                        callJavascriptFunction("javascript:getRemoteLevel()");
+                    }
+
+                    try {
+                        Thread.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     private void setupWebView() {
@@ -174,7 +202,6 @@ public class CallActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 // TODO: Check if call is already started
                 if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal) && callId == null) {
-
                     callId = receiverId;
                     firebaseRef.child(callId).child(userId).setValue(statusNormal);
                     callJavascriptFunction("javascript:startCall(\"" + receiverId + "\")");
@@ -207,10 +234,12 @@ public class CallActivity extends AppCompatActivity {
             case "normal":
                 otherUserEmoji.setText(getEmoji(emojiSmileClosed));
                 otherUserText.setText("Name");
+                isOtherUserMuted = false;
                 break;
             case "muted":
                 otherUserEmoji.setText(getEmoji(emojiZipped));
                 otherUserText.setText("Name (muted)");
+                isOtherUserMuted = true;
                 break;
         }
     }
@@ -227,8 +256,53 @@ public class CallActivity extends AppCompatActivity {
         webView.post(new Runnable() {
             @Override
             public void run() {
-                webView.evaluateJavascript(functionString, null);
+                webView.evaluateJavascript(functionString, new ValueCallback<String>() {
+                    @Override
+                    public void onReceiveValue(String value) {
+                        switch (functionString) {
+                            case "javascript:getLocalLevel()":
+                                changeCurrentUserEmoji(value);
+                                break;
+                            case "javascript:getRemoteLevel()":
+                                changeOtherUserEmoji(value);
+                                break;
+                        }
+                    }
+                });
             }
         });
+    }
+
+    private void changeCurrentUserEmoji(String soundLevel) {
+        if (soundLevel.equals("null") || isCurrentUserMuted) return;
+
+        Double soundLevelDouble = Double.parseDouble(soundLevel);
+
+        if (soundLevelDouble < 0.01) {
+            currentUserEmoji.setText(getEmoji(emojiSmileClosed));
+        } else {
+            currentUserEmoji.setText(getEmoji(emojiSmileOpened));
+        }
+    }
+
+    private void changeOtherUserEmoji(String soundLevel) {
+        if (soundLevel.equals("null") || isOtherUserMuted) return;
+
+        Double soundLevelDouble = Double.parseDouble(soundLevel);
+
+        if (soundLevelDouble < 0.01) {
+            otherUserEmoji.setText(getEmoji(emojiSmileClosed));
+        } else {
+            otherUserEmoji.setText(getEmoji(emojiSmileOpened));
+        }
+    }
+
+    private void startBackgroundAnimation() {
+        // Background gradient animation
+        RelativeLayout registerLayout = findViewById(R.id.call_layout);
+        AnimationDrawable animationDrawable = (AnimationDrawable) registerLayout.getBackground();
+        animationDrawable.setEnterFadeDuration(2000);
+        animationDrawable.setExitFadeDuration(4000);
+        animationDrawable.start();
     }
 }

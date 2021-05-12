@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RegisterActivity"
+    tools:context=".EditAccountInfoActivity"
     android:orientation="vertical"
     android:background="@drawable/gradient_list"
     android:scrollbars="none"
@@ -258,35 +258,31 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="32dp"
             android:paddingTop="16dp"
-            android:paddingBottom="50dp"
+            android:paddingBottom="64dp"
             android:animateLayoutChanges="true"
             android:background="@drawable/rounded_top_white_background">
 
-            <ProgressBar
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:indeterminateTint="@color/blue" />
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
-                android:background="@drawable/rounded_grey_stroke"
-                android:textSize="16dp"
-                android:fontFamily="sans-serif-black"
-                android:text="Finish registration"
-                android:id="@+id/register_finish_btn"/>
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/rounded_grey_stroke"
+                    android:textSize="16dp"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Finish registration"
+                    android:id="@+id/register_finish_btn"/>
 
-            <TextView
-                android:layout_below="@id/register_finish_btn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:gravity="center"
-                android:text="Account information can be changed later" />
+                <ProgressBar
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@color/blue" />
 
+            </RelativeLayout>
 
         </RelativeLayout>
 

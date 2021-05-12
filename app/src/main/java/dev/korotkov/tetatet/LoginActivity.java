@@ -11,19 +11,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -73,32 +68,6 @@ public class LoginActivity extends AppCompatActivity {
     TextView registerToLogin;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (currentUser != null) {
-            // If the user is already logged in
-            DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(currentUser.getUid());
-
-            userReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.getResult().exists()) {
-                        // If he completed the registration go to the Main Activity
-                        startActivity(new Intent(LoginActivity.this, CallActivity.class));
-                    } else {
-                        // If he did not complete the registration go to the Register Activity
-                        startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
-                    }
-                    finish();
-                }
-            });
-        }
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
@@ -134,13 +103,32 @@ public class LoginActivity extends AppCompatActivity {
 
         registerToLogin = (TextView) findViewById(R.id.register_to_login);
 
-        // Set smooth transition for title when swapping between login and register layouts
-        ((ViewGroup) findViewById(R.id.title_welcome)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        // Set smooth transition for card
-        ((ViewGroup) findViewById(R.id.bottom_card)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        checkAuthentication();
 
         startLoginLayoutListeners();
         startRegisterLayoutListeners();
+    }
+
+    private void checkAuthentication() {
+        // Set smooth transition for title when swapping between login and register layouts
+        ((ViewGroup) findViewById(R.id.title_welcome)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
+        // Set smooth transition for card
+        ((ViewGroup) findViewById(R.id.bottom_card)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
+        // Hide login layout
+        loginLinearLayout.setVisibility(View.GONE);
+
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (currentUser != null) {
+            // If the user is already logged in
+            switchToAnotherActivity(currentUser);
+        } else {
+            // Show login layout if user is not logged int
+            loginLinearLayout.setVisibility(View.VISIBLE);
+            loginLinearLayout.startAnimation(AnimationUtils.loadAnimation(LoginActivity.this, R.anim.show_up));
+        }
     }
 
     private void askPermission() {
@@ -224,8 +212,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        startActivity(new Intent(LoginActivity.this, CallActivity.class));
-                        finish();
+                        switchToAnotherActivity(FirebaseAuth.getInstance().getCurrentUser());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -299,7 +286,9 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                        Intent intent = new Intent(LoginActivity.this, EditAccountInfoActivity.class);
+                        intent.putExtra("button_text", "Finish registration");
+                        startActivity(intent);
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -341,6 +330,27 @@ public class LoginActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Close dialog
                 dialog.dismiss();
+            }
+        });
+    }
+
+    private void switchToAnotherActivity(FirebaseUser firebaseUser) {
+        DocumentReference userReference = FirebaseFirestore.getInstance().collection("users").document(firebaseUser.getUid());
+
+        userReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.getResult().exists()) {
+                    // If he completed the registration go to the Main Activity
+                    startActivity(new Intent(LoginActivity.this, SearchActivity.class));
+                } else {
+                    // If he did not complete the registration go to the Register Activity
+                    Intent intent = new Intent(LoginActivity.this, EditAccountInfoActivity.class);
+                    intent.putExtra("button_text", "Finish registration");
+                    startActivity(intent);
+                    finish();
+                }
+                finish();
             }
         });
     }

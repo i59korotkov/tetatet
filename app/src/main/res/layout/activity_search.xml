@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchActivity"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_list"
+    android:animateLayoutChanges="true"
+    android:paddingTop="40dp"
+    android:id="@+id/search_layout">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TEST"
+        android:id="@+id/test1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_marginTop="-40dp"
+        android:background="@color/white2"
+        android:paddingTop="56dp"
+        android:paddingBottom="16dp"
+        android:paddingHorizontal="48dp"
+        android:animateLayoutChanges="true"
+        android:id="@+id/search_bottom_user_info">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEST"
+            android:id="@+id/test2" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20dp"
+            android:textColor="@color/grey"
+            android:text="Common interests: 🏀 🚀 🎮"
+            android:id="@+id/search_interests"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textSize="20dp"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
+            android:id="@+id/search_description" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:paddingHorizontal="8dp">
+
+            <RelativeLayout
+                android:visibility="visible"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/start_controls">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:textSize="20dp"
+                    android:textColor="#ff000000"
+                    android:text="✏️"
+                    android:id="@+id/search_edit_data" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="32dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/blue"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Find someone"
+                    android:id="@+id/search_start_btn"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/search_controls">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/red"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Stop"
+                    android:id="@+id/search_stop_btn"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/blue"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Skip"
+                    android:id="@+id/search_skip_btn"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="16dp"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/green"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Call"
+                    android:id="@+id/search_call_btn"/>
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_above="@id/search_bottom_user_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/rounded_all_white_smaller_radius_background"
+        android:layout_marginHorizontal="32dp"
+        android:padding="8dp"
+        android:layout_centerHorizontal="true"
+        android:animateLayoutChanges="true"
+        android:id="@+id/search_user_card">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginRight="8dp"
+            android:textSize="64dp"
+            android:textColor="#ff000000"
+            android:text="👩‍🔧"
+            android:id="@+id/search_avatar" />
+
+        <TextView
+            android:layout_toEndOf="@id/search_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/grey"
+            android:textSize="32dp"
+            android:text="Julia, 23"
+            android:id="@+id/search_main_info"/>
+
+        <TextView
+            android:layout_toEndOf="@id/search_avatar"
+            android:layout_below="@id/search_main_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="#ff000000"
+            android:textSize="24dp"
+            android:text="🇬🇧 🇷🇺"
+            android:id="@+id/search_languages"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

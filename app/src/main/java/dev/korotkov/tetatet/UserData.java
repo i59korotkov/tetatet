@@ -11,6 +11,8 @@ public class UserData {
     private ArrayList<String> interestsIds;
     private ArrayList<String> languagesIds;
 
+    public UserData() { }
+
     public UserData(String name, Integer age, String avatarId, String description, ArrayList<String> interestsIds, ArrayList<String> languagesIds) {
         this.name = name;
         this.age = age;

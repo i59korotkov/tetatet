@@ -5,12 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    tools:context=".CallActivity">
+    android:background="@drawable/gradient_list"
+    tools:context=".CallActivity"
+    android:id="@+id/call_layout">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true">
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true">
 
         <Button
             android:layout_width="wrap_content"
@@ -29,7 +32,9 @@
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:padding="32dp"
         android:layout_centerInParent="true"
+        android:background="@drawable/rounded_all_white_smaller_radius_background"
         android:id="@+id/call_main_relative">
 
         <TextView
@@ -39,7 +44,6 @@
             android:textSize="128dp"
             android:textColor="#ff000000"
             android:text="🙂"
-            android:background="@drawable/emoji_form"
             android:id="@+id/call_current_user_emoji" />
 
         <TextView
@@ -70,7 +74,6 @@
             android:textSize="128dp"
             android:textColor="#ff000000"
             android:text="🙂"
-            android:background="@drawable/emoji_form"
             android:id="@+id/call_another_user_emoji" />
 
         <TextView
@@ -88,6 +91,7 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
