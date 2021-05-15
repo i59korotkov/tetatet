@@ -11,59 +11,50 @@
     android:paddingTop="40dp"
     android:id="@+id/search_layout">
 
-    <Button
+    <RelativeLayout
+        android:visibility="visible"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TEST"
-        android:id="@+id/test1" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:layout_marginTop="-40dp"
-        android:background="@color/white2"
-        android:paddingTop="56dp"
-        android:paddingBottom="16dp"
-        android:paddingHorizontal="48dp"
         android:animateLayoutChanges="true"
-        android:id="@+id/search_bottom_user_info">
+        android:id="@+id/current_user_card">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="TEST"
-            android:id="@+id/test2" />
-
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:textSize="20dp"
-            android:textColor="@color/grey"
-            android:text="Common interests: 🏀 🚀 🎮"
-            android:id="@+id/search_interests"/>
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_marginTop="-40dp"
+            android:background="@color/white2"
+            android:paddingTop="56dp"
+            android:paddingBottom="16dp"
+            android:paddingHorizontal="48dp"
+            android:animateLayoutChanges="true"
+            android:id="@+id/current_body">
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:textSize="20dp"
-            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
-            android:id="@+id/search_description" />
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal"
-            android:paddingHorizontal="8dp">
-
-            <RelativeLayout
-                android:visibility="visible"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20dp"
+                android:textColor="@color/grey"
+                android:text="Your interests: 🏀 🚀 🎮"
+                android:id="@+id/current_interests"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="20dp"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
+                android:id="@+id/current_description" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:animateLayoutChanges="true"
+                android:paddingHorizontal="8dp"
                 android:id="@+id/start_controls">
 
                 <TextView
@@ -75,7 +66,7 @@
                     android:textSize="20dp"
                     android:textColor="#ff000000"
                     android:text="✏️"
-                    android:id="@+id/search_edit_data" />
+                    android:id="@+id/edit_btn" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -91,14 +82,102 @@
                     android:textColor="@color/white"
                     android:textAlignment="center"
                     android:text="Find someone"
-                    android:id="@+id/search_start_btn"/>
+                    android:id="@+id/start_btn"/>
 
             </RelativeLayout>
 
-            <RelativeLayout
-                android:visibility="gone"
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_above="@id/current_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
+            android:layout_marginHorizontal="32dp"
+            android:padding="8dp"
+            android:layout_centerHorizontal="true"
+            android:animateLayoutChanges="true"
+            android:id="@+id/current_user_header">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="8dp"
+                android:textSize="64dp"
+                android:textColor="#ff000000"
+                android:text="👩‍🔧"
+                android:id="@+id/current_avatar" />
+
+            <TextView
+                android:layout_toEndOf="@id/current_avatar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/grey"
+                android:textSize="32dp"
+                android:text="Julia, 23"
+                android:id="@+id/current_main_info"/>
+
+            <TextView
+                android:layout_toEndOf="@id/current_avatar"
+                android:layout_below="@id/current_main_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#ff000000"
+                android:textSize="24dp"
+                android:text="🇬🇧 🇷🇺"
+                android:id="@+id/current_languages"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:id="@+id/other_user_card">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_marginTop="-40dp"
+            android:background="@color/white2"
+            android:paddingTop="56dp"
+            android:paddingBottom="16dp"
+            android:paddingHorizontal="48dp"
+            android:animateLayoutChanges="true"
+            android:id="@+id/other_body">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20dp"
+                android:textColor="@color/grey"
+                android:text="Common interests: 🏀 🚀 🎮"
+                android:id="@+id/other_interests"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="20dp"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
+                android:id="@+id/other_description" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:animateLayoutChanges="true"
+                android:paddingHorizontal="8dp"
                 android:id="@+id/search_controls">
 
                 <TextView
@@ -115,7 +194,7 @@
                     android:textColor="@color/white"
                     android:textAlignment="center"
                     android:text="Stop"
-                    android:id="@+id/search_stop_btn"/>
+                    android:id="@+id/stop_btn"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -130,7 +209,7 @@
                     android:textColor="@color/white"
                     android:textAlignment="center"
                     android:text="Skip"
-                    android:id="@+id/search_skip_btn"/>
+                    android:id="@+id/skip_btn"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -147,55 +226,55 @@
                     android:textColor="@color/white"
                     android:textAlignment="center"
                     android:text="Call"
-                    android:id="@+id/search_call_btn"/>
+                    android:id="@+id/call_btn"/>
 
             </RelativeLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
-    </LinearLayout>
-
-    <RelativeLayout
-        android:layout_above="@id/search_bottom_user_info"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/rounded_all_white_smaller_radius_background"
-        android:layout_marginHorizontal="32dp"
-        android:padding="8dp"
-        android:layout_centerHorizontal="true"
-        android:animateLayoutChanges="true"
-        android:id="@+id/search_user_card">
-
-        <TextView
+        <RelativeLayout
+            android:layout_above="@id/other_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginRight="8dp"
-            android:textSize="64dp"
-            android:textColor="#ff000000"
-            android:text="👩‍🔧"
-            android:id="@+id/search_avatar" />
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
+            android:layout_marginHorizontal="32dp"
+            android:padding="8dp"
+            android:layout_centerHorizontal="true"
+            android:animateLayoutChanges="true"
+            android:id="@+id/other_header">
 
-        <TextView
-            android:layout_toEndOf="@id/search_avatar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="@color/grey"
-            android:textSize="32dp"
-            android:text="Julia, 23"
-            android:id="@+id/search_main_info"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="8dp"
+                android:textSize="64dp"
+                android:textColor="#ff000000"
+                android:text="👩‍🔧"
+                android:id="@+id/other_avatar" />
 
-        <TextView
-            android:layout_toEndOf="@id/search_avatar"
-            android:layout_below="@id/search_main_info"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textColor="#ff000000"
-            android:textSize="24dp"
-            android:text="🇬🇧 🇷🇺"
-            android:id="@+id/search_languages"/>
+            <TextView
+                android:layout_toEndOf="@id/other_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/grey"
+                android:textSize="32dp"
+                android:text="Julia, 23"
+                android:id="@+id/other_main_info"/>
+
+            <TextView
+                android:layout_toEndOf="@id/other_avatar"
+                android:layout_below="@id/other_main_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#ff000000"
+                android:textSize="24dp"
+                android:text="🇬🇧 🇷🇺"
+                android:id="@+id/other_languages"/>
+
+        </RelativeLayout>
 
     </RelativeLayout>
 

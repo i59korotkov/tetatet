@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -33,6 +34,9 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -42,30 +46,35 @@ public class LoginActivity extends AppCompatActivity {
     int requestCode = 1;
 
     FirebaseAuth firebaseAuth;
+    FirebaseFirestore firebaseFirestore;
 
     boolean isLoginLayoutActive = true;
 
-    // Login linear layout
+    // Login layout
     LinearLayout loginLinearLayout;
-
     EditText loginEmailEditText;
     EditText loginPasswordEditText;
-
     Button loginButton;
-
     TextView loginToRegister;
     TextView resetPassword;
 
-    // Register linear layout
+    // Register layout
     LinearLayout registerLinerLayout;
-
     EditText registerEmailEditText;
     EditText registerPasswordEditText;
     EditText registerPasswordConfirmEditText;
-
     Button registerButton;
-
     TextView registerToLogin;
+
+    // Data lists from database
+    ArrayList<ItemWithEmoji> avatars = new ArrayList<>();
+    ArrayList<ItemWithEmoji> interests = new ArrayList<>();
+    ArrayList<ItemWithEmoji> languages = new ArrayList<>();
+    UserData currentUserData;
+    String userId;
+
+    // Switch intent
+    Intent switchIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +89,7 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseFirestore = FirebaseFirestore.getInstance();
 
         // Login linear layout
         loginLinearLayout = (LinearLayout) findViewById(R.id.login_liner_layout);
@@ -103,6 +113,12 @@ public class LoginActivity extends AppCompatActivity {
 
         registerToLogin = (TextView) findViewById(R.id.register_to_login);
 
+        // Set smooth transition for title when swapping between login and register layouts
+        ((ViewGroup) findViewById(R.id.title_welcome)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
+        // Set smooth transition for card
+        ((ViewGroup) findViewById(R.id.bottom_card)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+
         checkAuthentication();
 
         startLoginLayoutListeners();
@@ -110,12 +126,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void checkAuthentication() {
-        // Set smooth transition for title when swapping between login and register layouts
-        ((ViewGroup) findViewById(R.id.title_welcome)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-
-        // Set smooth transition for card
-        ((ViewGroup) findViewById(R.id.bottom_card)).getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-
         // Hide login layout
         loginLinearLayout.setVisibility(View.GONE);
 
@@ -123,6 +133,7 @@ public class LoginActivity extends AppCompatActivity {
 
         if (currentUser != null) {
             // If the user is already logged in
+            userId = firebaseAuth.getCurrentUser().getUid();
             switchToAnotherActivity(currentUser);
         } else {
             // Show login layout if user is not logged int
@@ -286,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Intent intent = new Intent(LoginActivity.this, EditAccountInfoActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, EditAccountActivity.class);
                         intent.putExtra("button_text", "Finish registration");
                         startActivity(intent);
                         finish();
@@ -342,15 +353,85 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.getResult().exists()) {
                     // If he completed the registration go to the Main Activity
-                    startActivity(new Intent(LoginActivity.this, SearchActivity.class));
+                    switchIntent = new Intent(LoginActivity.this, SearchActivity.class);
                 } else {
                     // If he did not complete the registration go to the Register Activity
-                    Intent intent = new Intent(LoginActivity.this, EditAccountInfoActivity.class);
-                    intent.putExtra("button_text", "Finish registration");
-                    startActivity(intent);
-                    finish();
+                    switchIntent = new Intent(LoginActivity.this, EditAccountActivity.class);
+                    switchIntent.putExtra("button_text", "Finish registration");
                 }
-                finish();
+                loadDataAndStartIntent();
+            }
+        });
+    }
+
+    private void loadDataAndStartIntent() {
+        loadCurrentUserDataFromDatabase();
+    }
+
+    private void loadCurrentUserDataFromDatabase() {
+        firebaseFirestore.collection("users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                currentUserData = documentSnapshot.toObject(UserData.class);
+
+                switchIntent.putExtra("user_data", currentUserData);
+                loadInterestsFromDatabase();
+            }
+        });
+    }
+
+    private void loadInterestsFromDatabase() {
+        firebaseFirestore.collection("interests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        interests.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
+                    }
+
+                    switchIntent.putExtra("interests", interests);
+                    loadLanguagesFromDatabase();
+                } else {
+                    makeDialogInfo("Error", "Cannot get interests list from database");
+                }
+            }
+        });
+    }
+
+    private void loadLanguagesFromDatabase() {
+        firebaseFirestore.collection("languages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        languages.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
+                    }
+
+                    switchIntent.putExtra("languages", languages);
+                    loadAvatarsFromDatabase();
+                } else {
+                    makeDialogInfo("Error", "Cannot get languages list from database");
+                }
+            }
+        });
+    }
+
+    private void loadAvatarsFromDatabase() {
+        firebaseFirestore.collection("avatars").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
+                        avatars.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
+                    }
+
+                    // Switch activities after all data is loaded
+                    switchIntent.putExtra("avatars", avatars);
+                    startActivity(switchIntent);
+                    finish();
+                } else {
+                    makeDialogInfo("Error", "Cannot get languages list from database");
+                }
             }
         });
     }

@@ -20,7 +20,7 @@
             android:name=".CallActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".EditAccountInfoActivity"
+            android:name=".EditAccountActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"

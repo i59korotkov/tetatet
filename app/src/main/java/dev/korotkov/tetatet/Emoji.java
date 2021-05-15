@@ -1,6 +1,8 @@
 package dev.korotkov.tetatet;
 
-public class Emoji {
+import java.io.Serializable;
+
+public class Emoji implements Serializable {
 
     private String id;
     private String emoji;

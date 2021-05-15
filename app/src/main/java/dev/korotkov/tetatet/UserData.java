@@ -1,8 +1,9 @@
 package dev.korotkov.tetatet;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class UserData {
+public class UserData implements Serializable {
 
     private String name;
     private Integer age;

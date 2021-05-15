@@ -1,8 +1,9 @@
 package dev.korotkov.tetatet;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class ItemWithEmoji extends Emoji {
+public class ItemWithEmoji extends Emoji implements Serializable {
 
     private String name;
 

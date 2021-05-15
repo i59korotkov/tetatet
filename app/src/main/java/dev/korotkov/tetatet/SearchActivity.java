@@ -8,19 +8,14 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AnimationUtils;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,11 +25,8 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.ThrowOnExtraProperties;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -47,27 +39,29 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     String userId;
     UserData currentUserData;
 
-    String incomingOfferId;
-    UserData incomingOfferData;
+    String otherUserId;
+    UserData otherUserData;
 
-    //
-    RelativeLayout userCardView;
-    LinearLayout bottomUserInfo;
-
-    // User card views
-    TextView avatarTextView;
-    TextView mainInfoTextView;
-    TextView languagesTextView;
-
-    // Other views
-    TextView interestsTextView;
-
-    TextView descriptionTextView;
+    // Current user card views
+    RelativeLayout currentUserCard;
+    TextView currentAvatar;
+    TextView currentMainInfo;
+    TextView currentLanguages;
+    TextView currentInterests;
+    TextView currentDescription;
 
     // Start controls
     RelativeLayout startControls;
     TextView editBtn;
     TextView startBtn;
+
+    // Other user card views
+    RelativeLayout otherUserCard;
+    TextView otherAvatar;
+    TextView otherMainInfo;
+    TextView otherLanguages;
+    TextView otherInterests;
+    TextView otherDescription;
 
     // Search controls
     RelativeLayout searchControls;
@@ -91,60 +85,46 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseRef = FirebaseDatabase.getInstance().getReference("search");
 
-        // Load data from database
-        loadInterestsFromDatabase();
-        loadLanguagesFromDatabase();
-        loadAvatarsFromDatabase();
+        // Get data from intent
+        avatars = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("avatars");
+        interests = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("interests");
+        languages = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("languages");
+        currentUserData = (UserData) getIntent().getSerializableExtra("user_data");
 
         userId = firebaseAuth.getCurrentUser().getUid();
 
-        avatarTextView = (TextView) findViewById(R.id.search_avatar);
-        mainInfoTextView = (TextView) findViewById(R.id.search_main_info);
-        languagesTextView = (TextView) findViewById(R.id.search_languages);
+        // Current user card views
+        currentUserCard = findViewById(R.id.current_user_card);
+        currentAvatar = findViewById(R.id.current_avatar);
+        currentMainInfo = findViewById(R.id.current_main_info);
+        currentLanguages = findViewById(R.id.current_languages);
+        currentInterests = findViewById(R.id.current_interests);
+        currentDescription = findViewById(R.id.current_description);
 
-        interestsTextView = (TextView) findViewById(R.id.search_interests);
+        // Other user card views
+        otherUserCard = findViewById(R.id.other_user_card);
+        otherAvatar = findViewById(R.id.other_avatar);
+        otherMainInfo = findViewById(R.id.other_main_info);
+        otherLanguages = findViewById(R.id.other_languages);
+        otherInterests = findViewById(R.id.other_interests);
+        otherDescription = findViewById(R.id.other_description);
 
-        descriptionTextView = (TextView) findViewById(R.id.search_description);
+        // Start controls
+        startControls = findViewById(R.id.start_controls);
+        editBtn = findViewById(R.id.edit_btn);
+        startBtn = findViewById(R.id.start_btn);
 
-        startControls = (RelativeLayout) findViewById(R.id.start_controls);
-        editBtn = (TextView) findViewById(R.id.search_edit_data);
-        startBtn = (TextView) findViewById(R.id.search_start_btn);
-
-        searchControls = (RelativeLayout) findViewById(R.id.search_controls);
-        callBtn = (TextView) findViewById(R.id.search_call_btn);
-        skipBtn = (TextView) findViewById(R.id.search_skip_btn);
-        stopBtn = (TextView) findViewById(R.id.search_stop_btn);
-
-        userCardView = (RelativeLayout) findViewById(R.id.search_user_card);
-        bottomUserInfo = (LinearLayout) findViewById(R.id.search_bottom_user_info);
+        // Search controls
+        searchControls = findViewById(R.id.search_controls);
+        callBtn = findViewById(R.id.call_btn);
+        skipBtn = findViewById(R.id.skip_btn);
+        stopBtn = findViewById(R.id.stop_btn);
 
         // Set smooth transition
-        userCardView.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
-        bottomUserInfo.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        currentUserCard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
+        otherUserCard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
-        // TODO Remove
-        findViewById(R.id.test1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(SearchActivity.this, "Test1", Toast.LENGTH_SHORT).show();
-            }
-        });
-        findViewById(R.id.test2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(SearchActivity.this, "Test2", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        hideUserCard();
-
-        // Set current user info 100 millis after activity started
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                setCurrentUserCardData();
-            }
-        }, 200);
+        setCurrentUserCardData();
 
         editBtn.setOnClickListener(this);
         startBtn.setOnClickListener(this);
@@ -156,10 +136,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.search_start_btn:
-                Toast.makeText(SearchActivity.this, "Start btn clicked", Toast.LENGTH_SHORT).show();
-
-                hideUserCard();
+            case R.id.start_btn:
+                hideCurrentUserCard();
 
                 // Add user to database
                 firebaseRef.child(userId).child("status").setValue("searching");
@@ -188,10 +166,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     public void onCancelled(@NonNull DatabaseError error) { }
                 });
                 break;
-            case R.id.search_stop_btn:
-                Toast.makeText(SearchActivity.this, "Stop btn clicked", Toast.LENGTH_SHORT).show();
-
-                hideUserCard();
+            case R.id.stop_btn:
+                hideOtherUserCard();
 
                 // Stop listening for incoming offers
                 firebaseRef.child(userId).child("status").setValue("stopped");
@@ -199,21 +175,21 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 // Remove user from database
                 firebaseRef.child(userId).removeValue();
 
-                changeSearchControls();
-
-                setCurrentUserCardData();
-
-                showUserCard();
+                showCurrentUserCard();
                 break;
-            case R.id.search_skip_btn:
+            case R.id.skip_btn:
                 Toast.makeText(SearchActivity.this, "Skip btn clicked", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.search_call_btn:
+            case R.id.call_btn:
                 Toast.makeText(SearchActivity.this, "Call btn clicked", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.search_edit_data:
-                Intent intent = new Intent(SearchActivity.this, EditAccountInfoActivity.class);
+            case R.id.edit_btn:
+                Intent intent = new Intent(SearchActivity.this, EditAccountActivity.class);
                 intent.putExtra("button_text", "Save changes");
+                intent.putExtra("avatars", avatars);
+                intent.putExtra("interests", interests);
+                intent.putExtra("languages", languages);
+                intent.putExtra("user_data", currentUserData);
                 startActivity(intent);
                 break;
         }
@@ -228,8 +204,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
                 isBusy = true;
 
-                String otherUserId = snapshot.getValue().toString();
-                incomingOfferId = otherUserId;
+                otherUserId = snapshot.getValue().toString();
 
                 DocumentReference otherUserDocumentReference = firebaseFirestore.collection("users").document(otherUserId);
 
@@ -237,13 +212,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         // Get user data from document
-                        incomingOfferData = documentSnapshot.toObject(UserData.class);
+                        otherUserData = documentSnapshot.toObject(UserData.class);
 
-                        // Change search controls
-                        changeSearchControls();
+                        // Set other user data
+                        setOtherUserCardData(otherUserData);
 
-                        // Show incoming user
-                        setUserCardData(incomingOfferData);
+                        // Show other user card
+                        showOtherUserCard();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -265,7 +240,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void setUserCardData(UserData userData) {
+    private void setOtherUserCardData(UserData userData) {
         String userAvatar = "\uD83E\uDDD1";
         for (ItemWithEmoji avatar : avatars) {
             if (userData.getAvatarId().equals(avatar.getId())) userAvatar = avatar.getEmoji();
@@ -273,8 +248,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         String commonInterests = "";
         for (ItemWithEmoji interest : interests) {
-            // TODO: Add common interests
-            if (userData.getInterestsIds().contains(interest.getId())) commonInterests += " " + interest.getEmoji();
+            // TODO: Add common interests only
+            if (userData.getInterestsIds().contains(interest.getId()) && currentUserData.getInterestsIds().contains(interest.getId())) commonInterests += " " + interest.getEmoji();
         }
 
         String userLanguages = "";
@@ -283,140 +258,67 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         // Set user data to view
-        avatarTextView.setText(userAvatar);
-        mainInfoTextView.setText(userData.getName() + ", " + userData.getAge().toString());
-        languagesTextView.setText(userLanguages);
+        otherAvatar.setText(userAvatar);
+        otherMainInfo.setText(userData.getName() + ", " + userData.getAge().toString());
+        otherLanguages.setText(userLanguages);
 
-        if (commonInterests.isEmpty()) interestsTextView.setText("You do not have any common interests");
-        else interestsTextView.setText("Common interests:" + commonInterests);
+        if (commonInterests.isEmpty()) otherInterests.setText("You do not have any common interests");
+        else otherInterests.setText("Common interests:" + commonInterests);
 
         if (userData.getDescription() == null || userData.getDescription().isEmpty()) {
-            descriptionTextView.setVisibility(View.GONE);
+            otherDescription.setVisibility(View.GONE);
         } else {
-            descriptionTextView.setVisibility(View.VISIBLE);
-            descriptionTextView.setText(userData.getDescription());
+            otherDescription.setVisibility(View.VISIBLE);
+            otherDescription.setText(userData.getDescription());
         }
-
-        showUserCard();
     }
 
-    private void hideUserCard() {
-        userCardView.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
-        userCardView.setVisibility(View.GONE);
-
-        bottomUserInfo.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
-        bottomUserInfo.setVisibility(View.GONE);
+    private void hideCurrentUserCard() {
+        currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
+        currentUserCard.setVisibility(View.GONE);
     }
 
-    private void showUserCard() {
-        userCardView.setVisibility(View.VISIBLE);
-        userCardView.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
-
-        bottomUserInfo.setVisibility(View.VISIBLE);
-        bottomUserInfo.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
+    private void showCurrentUserCard() {
+        currentUserCard.setVisibility(View.VISIBLE);
+        currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
     }
 
-    private void changeSearchControls() {
-        if (startControls.getVisibility() == View.VISIBLE) {
-            startControls.setVisibility(View.GONE);
-            searchControls.setVisibility(View.VISIBLE);
-        } else {
-            startControls.setVisibility(View.VISIBLE);
-            searchControls.setVisibility(View.GONE);
-        }
+    private void hideOtherUserCard() {
+        otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
+        otherUserCard.setVisibility(View.GONE);
+    }
+
+    private void showOtherUserCard() {
+        otherUserCard.setVisibility(View.VISIBLE);
+        otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
     }
 
     private void setCurrentUserCardData() {
-        DocumentReference userDocumentReference = firebaseFirestore.collection("users").document(userId);
+        String userAvatar = "\uD83D\uDC64";
+        for (ItemWithEmoji avatar : avatars) {
+            if (currentUserData.getAvatarId().equals(avatar.getId())) userAvatar = avatar.getEmoji();
+        }
 
-        userDocumentReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                // Get user data from document
-                currentUserData = documentSnapshot.toObject(UserData.class);
+        String userInterests = "";
+        for (ItemWithEmoji interest : interests) {
+            if (currentUserData.getInterestsIds().contains(interest.getId())) userInterests += " " + interest.getEmoji();
+        }
 
-                String userAvatar = "\uD83D\uDC64";
-                for (ItemWithEmoji avatar : avatars) {
-                    if (currentUserData.getAvatarId().equals(avatar.getId())) userAvatar = avatar.getEmoji();
-                }
+        String userLanguages = "";
+        for (ItemWithEmoji language : languages) {
+            if (currentUserData.getLanguagesIds().contains(language.getId())) userLanguages += language.getEmoji() + " ";
+        }
 
-                String userInterests = "";
-                for (ItemWithEmoji interest : interests) {
-                    if (currentUserData.getInterestsIds().contains(interest.getId())) userInterests += " " + interest.getEmoji();
-                }
+        // Set user data to view
+        currentAvatar.setText(userAvatar);
+        currentMainInfo.setText(currentUserData.getName() + ", " + currentUserData.getAge().toString());
+        currentLanguages.setText(userLanguages);
 
-                String userLanguages = "";
-                for (ItemWithEmoji language : languages) {
-                    if (currentUserData.getLanguagesIds().contains(language.getId())) userLanguages += language.getEmoji() + " ";
-                }
+        if (userInterests.isEmpty()) currentInterests.setText("You have not chosen any interest");
+        else currentInterests.setText("Your interests:" + userInterests);
 
-                // Set user data to view
-                avatarTextView.setText(userAvatar);
-                mainInfoTextView.setText(currentUserData.getName() + ", " + currentUserData.getAge().toString());
-                languagesTextView.setText(userLanguages);
-
-                if (userInterests.isEmpty()) interestsTextView.setText("You have not chosen any interest");
-                else interestsTextView.setText("Your interests:" + userInterests);
-
-                if (currentUserData.getDescription() == null || currentUserData.getDescription().isEmpty()) descriptionTextView.setVisibility(View.GONE);
-                else descriptionTextView.setText(currentUserData.getDescription());
-
-                showUserCard();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                makeDialogInfo("Error", e.getMessage());
-            }
-        });
-    }
-
-    private void loadInterestsFromDatabase() {
-        firebaseFirestore.collection("interests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        interests.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get interests list from database");
-                    Log.i("INTERESTS", task.getException().getMessage());
-                }
-            }
-        });
-    }
-
-    private void loadLanguagesFromDatabase() {
-        firebaseFirestore.collection("languages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        languages.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get languages list from database");
-                    Log.i("LANGUAGES", task.getException().getMessage());
-                }
-            }
-        });
-    }
-
-    private void loadAvatarsFromDatabase() {
-        firebaseFirestore.collection("avatars").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        avatars.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get languages list from database");
-                    Log.i("LANGUAGES", task.getException().getMessage());
-                }
-            }
-        });
+        if (currentUserData.getDescription() == null || currentUserData.getDescription().isEmpty()) currentDescription.setVisibility(View.GONE);
+        else currentDescription.setText(currentUserData.getDescription());
     }
 
     private void makeDialogInfo(String title, String description) {

@@ -17,7 +17,6 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,12 +29,13 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
-public class EditAccountInfoActivity extends AppCompatActivity {
+public class EditAccountActivity extends AppCompatActivity {
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
 
     String userId;
+    UserData currentUserData;
 
     TextView registerFinishBtn;
 
@@ -43,47 +43,49 @@ public class EditAccountInfoActivity extends AppCompatActivity {
     EditText registerName;
     EditText registerAge;
 
-    // Description
-    EditText registerDescription;
-
     // Avatars
     TextView registerAvatarBtn;
-    ArrayList<ItemWithEmoji> avatars = new ArrayList<>();
     ItemWithEmoji chosenAvatar;
+
+    // Description
+    EditText registerDescription;
 
     // Interests
     TextView registerInterestsBtn;
     ListView chosenInterestsListView;
     ItemWithEmojiAdapter interestAdapter;
-
-    ArrayList<ItemWithEmoji> interests = new ArrayList<>();
     ArrayList<ItemWithEmoji> chosenInterests = new ArrayList<>();
 
     // Languages
     TextView registerLanguagesBtn;
     ListView chosenLanguagesListView;
     ItemWithEmojiAdapter languagesAdapter;
-
-    ArrayList<ItemWithEmoji> languages = new ArrayList<>();
     ArrayList<ItemWithEmoji> chosenLanguages = new ArrayList<>();
+
+    // Data lists from database
+    ArrayList<ItemWithEmoji> avatars = new ArrayList<>();
+    ArrayList<ItemWithEmoji> interests = new ArrayList<>();
+    ArrayList<ItemWithEmoji> languages = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_account_info);
+        setContentView(R.layout.activity_edit_account);
 
         startBackgroundAnimation();
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
 
+        // Get data from intent
+        avatars = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("avatars");
+        interests = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("interests");
+        languages = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("languages");
+        currentUserData = (UserData) getIntent().getSerializableExtra("user_data");
+
         userId = firebaseAuth.getCurrentUser().getUid();
 
         registerFinishBtn = (TextView) findViewById(R.id.register_finish_btn);
-
-        // Set finish btn text
-        String finishBtnText = getIntent().getStringExtra("button_text");
-        registerFinishBtn.setText(finishBtnText);
 
         registerAvatarBtn = (TextView) findViewById(R.id.register_avatar_btn);
         registerInterestsBtn = (TextView) findViewById(R.id.register_interests_btn);
@@ -96,26 +98,21 @@ public class EditAccountInfoActivity extends AppCompatActivity {
         chosenInterestsListView = (ListView) findViewById(R.id.register_chosen_interests_list);
         chosenLanguagesListView = (ListView) findViewById(R.id.register_chosen_languages_list);
 
-        loadInterestsFromDatabase();
-        loadLanguagesFromDatabase();
-        loadAvatarsFromDatabase();
+        // Set finish btn text
+        String finishBtnText = getIntent().getStringExtra("button_text");
+        registerFinishBtn.setText(finishBtnText);
 
         // Set adapter for chosen interests
-        interestAdapter = new ItemWithEmojiAdapter(EditAccountInfoActivity.this, R.layout.adapter_item_with_emoji, chosenInterests);
+        interestAdapter = new ItemWithEmojiAdapter(EditAccountActivity.this, R.layout.adapter_item_with_emoji, chosenInterests);
         chosenInterestsListView.setAdapter(interestAdapter);
 
         // Set adapter for chosen languages
-        languagesAdapter = new ItemWithEmojiAdapter(EditAccountInfoActivity.this, R.layout.adapter_item_with_emoji, chosenLanguages);
+        languagesAdapter = new ItemWithEmojiAdapter(EditAccountActivity.this, R.layout.adapter_item_with_emoji, chosenLanguages);
         chosenLanguagesListView.setAdapter(languagesAdapter);
 
         // If finish btn text is "Save changes" than fill edit texts with current user info from database
         if (finishBtnText.equals("Save changes")) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    fillFormWithCurrentUserInfo();
-                }
-            }, 200);
+            fillFormWithCurrentUserInfo();
         }
 
         registerAvatarBtn.setOnClickListener(new View.OnClickListener() {
@@ -128,7 +125,7 @@ public class EditAccountInfoActivity extends AppCompatActivity {
         registerInterestsBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountInfoActivity.this, R.layout.adapter_item_with_emoji, interests, chosenInterests);
+                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountActivity.this, R.layout.adapter_item_with_emoji, interests, chosenInterests);
 
                 // Show dialog windows and set items clickable
                 showDialogMultipleChoice(adapter, "Choose your interests").setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -157,7 +154,7 @@ public class EditAccountInfoActivity extends AppCompatActivity {
         registerLanguagesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountInfoActivity.this, R.layout.adapter_item_with_emoji, languages, chosenLanguages);
+                ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountActivity.this, R.layout.adapter_item_with_emoji, languages, chosenLanguages);
 
                 // Show dialog windows and set items clickable
                 showDialogMultipleChoice(adapter, "Choose your languages").setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -247,12 +244,18 @@ public class EditAccountInfoActivity extends AppCompatActivity {
                 registerFinishBtn.setVisibility(View.INVISIBLE);
 
                 // Store user data in database
-                UserData userData = new UserData(name, age, chosenAvatar.getId(), description, chosenInterestsIds, chosenLanguagesIds);
+                currentUserData = new UserData(name, age, chosenAvatar.getId(), description, chosenInterestsIds, chosenLanguagesIds);
 
-                firebaseFirestore.collection("users").document(userId).set(userData).addOnSuccessListener(new OnSuccessListener<Void>() {
+                firebaseFirestore.collection("users").document(userId).set(currentUserData).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        startActivity(new Intent(EditAccountInfoActivity.this, SearchActivity.class));
+                        Intent intent = new Intent(EditAccountActivity.this, SearchActivity.class);
+                        intent.putExtra("button_text", "Save changes");
+                        intent.putExtra("avatars", avatars);
+                        intent.putExtra("interests", interests);
+                        intent.putExtra("languages", languages);
+                        intent.putExtra("user_data", currentUserData);
+                        startActivity(intent);
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -278,98 +281,38 @@ public class EditAccountInfoActivity extends AppCompatActivity {
         }
     }
 
-    private void loadInterestsFromDatabase() {
-        firebaseFirestore.collection("interests").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        interests.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get interests list from database");
-                    Log.i("INTERESTS", task.getException().getMessage());
-                }
-            }
-        });
-    }
-
-    private void loadLanguagesFromDatabase() {
-        firebaseFirestore.collection("languages").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        languages.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get languages list from database");
-                    Log.i("LANGUAGES", task.getException().getMessage());
-                }
-            }
-        });
-    }
-
-    private void loadAvatarsFromDatabase() {
-        firebaseFirestore.collection("avatars").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult().getDocuments()) {
-                        avatars.add(new ItemWithEmoji(document.getId(), document.getString("name"), document.getString("emoji")));
-                    }
-                } else {
-                    makeDialogInfo("Error", "Cannot get languages list from database");
-                    Log.i("LANGUAGES", task.getException().getMessage());
-                }
-            }
-        });
-    }
-
     private void fillFormWithCurrentUserInfo() {
-        firebaseFirestore.collection("users").document(userId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                UserData userData = documentSnapshot.toObject(UserData.class);
+        registerName.setText(currentUserData.getName());
+        registerAge.setText(currentUserData.getAge().toString());
+        registerDescription.setText(currentUserData.getDescription());
 
-                registerName.setText(userData.getName());
-                registerAge.setText(userData.getAge().toString());
-                registerDescription.setText(userData.getDescription());
+        chosenAvatar = new ItemWithEmoji("000", "Unknown", "\uD83D\uDC64");
+        for (ItemWithEmoji avatar : avatars) {
+            if (currentUserData.getAvatarId().equals(avatar.getId())) chosenAvatar = avatar;
+        }
 
-                chosenAvatar = new ItemWithEmoji("000", "Unknown", "\uD83D\uDC64");
-                for (ItemWithEmoji avatar : avatars) {
-                    if (userData.getAvatarId().equals(avatar.getId())) chosenAvatar = avatar;
-                }
+        // Change avatar view
+        TextView registerAvatarEmoji = findViewById(R.id.register_avatar_emoji);
+        TextView registerAvatarBtn = findViewById(R.id.register_avatar_btn);
 
-                // Change avatar view
-                TextView registerAvatarEmoji= findViewById(R.id.register_avatar_emoji);
-                TextView registerAvatarBtn = findViewById(R.id.register_avatar_btn);
+        registerAvatarEmoji.setVisibility(View.VISIBLE);
+        registerAvatarEmoji.setText(chosenAvatar.getEmoji());
+        registerAvatarBtn.setText("Change avatar");
 
-                registerAvatarEmoji.setVisibility(View.VISIBLE);
-                registerAvatarEmoji.setText(chosenAvatar.getEmoji());
-                registerAvatarBtn.setText("Change avatar");
+        for (ItemWithEmoji interest : interests) {
+            if (currentUserData.getInterestsIds().contains(interest.getId())) chosenInterests.add(interest);
+        }
+        interestAdapter.notifyDataSetChanged();
 
-                for (ItemWithEmoji interest : interests) {
-                    if (userData.getInterestsIds().contains(interest.getId())) chosenInterests.add(interest);
-                }
-                interestAdapter.notifyDataSetChanged();
-
-                for (ItemWithEmoji language : languages) {
-                    if (userData.getLanguagesIds().contains(language.getId())) chosenLanguages.add(language);
-                }
-                languagesAdapter.notifyDataSetChanged();
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                makeDialogInfo("Error", "Cannot load your account information. Error message: " + e.getMessage());
-            }
-        });
+        for (ItemWithEmoji language : languages) {
+            if (currentUserData.getLanguagesIds().contains(language.getId())) chosenLanguages.add(language);
+        }
+        languagesAdapter.notifyDataSetChanged();
     }
 
     private ListView showDialogMultipleChoice(ListAdapter adapter, String title) {
         // Create dialog from layout
-        Dialog dialog = new Dialog(EditAccountInfoActivity.this);
+        Dialog dialog = new Dialog(EditAccountActivity.this);
         dialog.setContentView(R.layout.dialog_list_multiple_choice);
         dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
 
@@ -396,7 +339,7 @@ public class EditAccountInfoActivity extends AppCompatActivity {
 
     private void showDialogAvatarChoice() {
         // Create dialog from layout
-        Dialog dialog = new Dialog(EditAccountInfoActivity.this);
+        Dialog dialog = new Dialog(EditAccountActivity.this);
         dialog.setContentView(R.layout.dialog_list_single_choice);
         dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
 
@@ -405,7 +348,7 @@ public class EditAccountInfoActivity extends AppCompatActivity {
 
         // Populate avatar list with emojis from resources
         ListView avatarList = dialog.findViewById(R.id.dialog_list_single_choice_list);
-        ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountInfoActivity.this, R.layout.adapter_item_with_emoji, avatars, 24);
+        ItemWithEmojiAdapter adapter = new ItemWithEmojiAdapter(EditAccountActivity.this, R.layout.adapter_item_with_emoji, avatars, 24);
         avatarList.setAdapter(adapter);
 
         // Show dialog
