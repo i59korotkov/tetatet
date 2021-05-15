@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
-import android.view.animation.AnimationUtils;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +36,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     Boolean isBusy = false;
 
-    String userId;
+    String currentUserId;
     UserData currentUserData;
 
     String otherUserId;
@@ -69,6 +69,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     TextView skipBtn;
     TextView stopBtn;
 
+    LinearLayout cancelLayout;
+    TextView cancelBtn;
+
     // Data lists from database
     ArrayList<ItemWithEmoji> avatars = new ArrayList<>();
     ArrayList<ItemWithEmoji> interests = new ArrayList<>();
@@ -91,7 +94,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         languages = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("languages");
         currentUserData = (UserData) getIntent().getSerializableExtra("user_data");
 
-        userId = firebaseAuth.getCurrentUser().getUid();
+        currentUserId = firebaseAuth.getCurrentUser().getUid();
 
         // Current user card views
         currentUserCard = findViewById(R.id.current_user_card);
@@ -120,17 +123,24 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         skipBtn = findViewById(R.id.skip_btn);
         stopBtn = findViewById(R.id.stop_btn);
 
+        cancelLayout = findViewById(R.id.cancel_layout);
+        cancelBtn = findViewById(R.id.cancel_btn);
+
         // Set smooth transition
         currentUserCard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
         otherUserCard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
 
         setCurrentUserCardData();
 
+        hideOtherUserCard();
+        otherUserCard.setVisibility(View.VISIBLE);
+
         editBtn.setOnClickListener(this);
         startBtn.setOnClickListener(this);
         stopBtn.setOnClickListener(this);
         skipBtn.setOnClickListener(this);
         callBtn.setOnClickListener(this);
+        cancelBtn.setOnClickListener(this);
     }
 
     @Override
@@ -138,47 +148,35 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         switch(v.getId()){
             case R.id.start_btn:
                 hideCurrentUserCard();
+                cancelLayout.setVisibility(View.VISIBLE);
 
-                // Add user to database
-                firebaseRef.child(userId).child("status").setValue("searching");
-
-                // Start listening for incoming offer
-                listenForIncomingOffer();
-
-                // Offer call to random user
-                firebaseRef.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot == null || snapshot.getChildrenCount() <= 1) return;
-
-                        ArrayList<String> searchingUsers = new ArrayList<>();
-
-                        for (DataSnapshot user : snapshot.getChildren()) {
-                            searchingUsers.add(user.getValue().toString());
-                        }
-
-                        String randomUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
-
-                        firebaseRef.child(randomUserId).child("offer").setValue(userId);
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
-                });
+                startSearching();
                 break;
+            case R.id.cancel_btn:
             case R.id.stop_btn:
                 hideOtherUserCard();
+                cancelLayout.setVisibility(View.GONE);
 
                 // Stop listening for incoming offers
-                firebaseRef.child(userId).child("status").setValue("stopped");
+                firebaseRef.child(currentUserId).child("status").setValue("stopped");
 
                 // Remove user from database
-                firebaseRef.child(userId).removeValue();
+                firebaseRef.child(currentUserId).removeValue();
 
                 showCurrentUserCard();
+
+                isBusy = false;
+
                 break;
             case R.id.skip_btn:
-                Toast.makeText(SearchActivity.this, "Skip btn clicked", Toast.LENGTH_SHORT).show();
+                hideOtherUserCard();
+
+                // Remove offer from db
+                firebaseRef.child(currentUserId).child("offer").removeValue();
+
+                startSearching();
+
+                isBusy = false;
                 break;
             case R.id.call_btn:
                 Toast.makeText(SearchActivity.this, "Call btn clicked", Toast.LENGTH_SHORT).show();
@@ -195,12 +193,59 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void startSearching() {
+        // Add user to database
+        firebaseRef.child(currentUserId).child("status").setValue("searching");
+
+        // Start listening for incoming offer
+        listenForIncomingOffer();
+
+        // Offer call to random user
+        firebaseRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot == null || snapshot.getChildrenCount() <= 1 || isBusy) return;
+                isBusy = true;
+
+                ArrayList<String> searchingUsers = new ArrayList<>();
+
+                for (DataSnapshot user : snapshot.getChildren()) {
+                    if (!user.getKey().equals(currentUserId)) searchingUsers.add(user.getKey());
+                }
+
+                String randomUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
+
+                firebaseRef.child(randomUserId).child("offer").setValue(currentUserId);
+                firebaseRef.child(randomUserId).child("status").setValue("offered");
+
+                firebaseRef.child(currentUserId).child("status").setValue("accepted");
+
+                // Get other user data
+                firebaseFirestore.collection("users").document(randomUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        setOtherUserCardData(documentSnapshot.toObject(UserData.class));
+
+                        showOtherUserCard();
+                    }
+                });
+
+                firebaseRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
     private void listenForIncomingOffer() {
-        firebaseRef.child(userId).child("offer").addValueEventListener(new ValueEventListener() {
+        firebaseRef.child(currentUserId).child("offer").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() == null || snapshot.getValue().toString().equals("searching") || snapshot.getValue().toString().equals("stopped"))
                     return;
+
+                firebaseRef.child(currentUserId).child("status").setValue("accepted");
 
                 isBusy = true;
 
@@ -225,13 +270,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     public void onFailure(@NonNull Exception e) {
                         isBusy = false;
                         // Ignore incoming offer if error occurs
-                        firebaseRef.child(userId).child("status").setValue("searching");
+                        firebaseRef.child(currentUserId).child("status").setValue("searching");
                         listenForIncomingOffer();
                     }
                 });
 
                 // Remove listener
-                firebaseRef.child(userId).child("offer").removeEventListener(this);
+                firebaseRef.child(currentUserId).child("offer").removeEventListener(this);
             }
 
             @Override
@@ -274,23 +319,23 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void hideCurrentUserCard() {
-        currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
-        currentUserCard.setVisibility(View.GONE);
+        //currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
+        currentUserCard.animate().translationY(1500).setDuration(200);
     }
 
     private void showCurrentUserCard() {
-        currentUserCard.setVisibility(View.VISIBLE);
-        currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
+        //currentUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
+        currentUserCard.animate().translationY(0).setDuration(500);
     }
 
     private void hideOtherUserCard() {
-        otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
-        otherUserCard.setVisibility(View.GONE);
+        //otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.hide_down));
+        otherUserCard.animate().translationY(1500).setDuration(200);
     }
 
     private void showOtherUserCard() {
-        otherUserCard.setVisibility(View.VISIBLE);
-        otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
+        //otherUserCard.startAnimation(AnimationUtils.loadAnimation(SearchActivity.this, R.anim.show_up));
+        otherUserCard.animate().translationY(0).setDuration(500);
     }
 
     private void setCurrentUserCardData() {
@@ -351,5 +396,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(4000);
         animationDrawable.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        firebaseRef.child(currentUserId).removeValue();
+
+        super.onDestroy();
     }
 }

@@ -2,7 +2,11 @@ package dev.korotkov.tetatet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
+import android.app.Dialog;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -23,6 +27,11 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class CallActivity extends AppCompatActivity {
+
+    String[] permissions = {
+            Manifest.permission.RECORD_AUDIO
+    };
+    int requestCode = 1;
 
     DatabaseReference firebaseRef;
 
@@ -53,10 +62,10 @@ public class CallActivity extends AppCompatActivity {
 
     boolean isOtherUserMuted = false;
 
-    // Emoji codes
-    int emojiSmileClosed = 0x1F642;
-    int emojiSmileOpened = 0x1F600;
-    int emojiZipped = 0x1F910;
+    // Emojis
+    String emojiSmileClosed = "\uD83D\uDE42";
+    String emojiSmileOpened = "\uD83D\uDE00";
+    String emojiZipped = "\uD83E\uDD10";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,9 +93,21 @@ public class CallActivity extends AppCompatActivity {
         // Set volume controls to music
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
+        // Check permissions
+        if (!isPermissionGranted()) {
+            currentUserEmoji.setText(emojiZipped);
+            isCurrentUserMuted = true;
+            askPermission();
+        }
+
         currentUserEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (!isPermissionGranted()) {
+                    makeDialogInfo("Warning", "The app needs access to your microphone. You can provide it in the settings");
+                    return;
+                }
+
                 isCurrentUserMuted = !isCurrentUserMuted;
 
                 if (isCurrentUserMuted) {
@@ -96,7 +117,7 @@ public class CallActivity extends AppCompatActivity {
 
                     callJavascriptFunction("javascript:toggleAudio(\"" + !isCurrentUserMuted + "\")");
 
-                    currentUserEmoji.setText(getEmoji(emojiZipped));
+                    currentUserEmoji.setText(emojiZipped);
                     currentUserText.setText("You (muted)");
                 } else {
                     firebaseRef.child(callId).child(userId).setValue(statusNormal);
@@ -105,7 +126,7 @@ public class CallActivity extends AppCompatActivity {
 
                     callJavascriptFunction("javascript:toggleAudio(\"" + !isCurrentUserMuted + "\")");
 
-                    currentUserEmoji.setText(getEmoji(emojiSmileClosed));
+                    currentUserEmoji.setText(emojiSmileClosed);
                     currentUserText.setText("You");
                 }
             }
@@ -121,6 +142,22 @@ public class CallActivity extends AppCompatActivity {
         setupWebView();
 
         startSoundCheckRunnable();
+    }
+
+    private void askPermission() {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+
+    }
+
+    private boolean isPermissionGranted() {
+
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void startSoundCheckRunnable() {
@@ -232,20 +269,16 @@ public class CallActivity extends AppCompatActivity {
     private void updateOtherUserStatus(String status) {
         switch (status) {
             case "normal":
-                otherUserEmoji.setText(getEmoji(emojiSmileClosed));
+                otherUserEmoji.setText(emojiSmileClosed);
                 otherUserText.setText("Name");
                 isOtherUserMuted = false;
                 break;
             case "muted":
-                otherUserEmoji.setText(getEmoji(emojiZipped));
+                otherUserEmoji.setText(emojiZipped);
                 otherUserText.setText("Name (muted)");
                 isOtherUserMuted = true;
                 break;
         }
-    }
-
-    private String getEmoji(int unicode) {
-        return new String(Character.toChars(unicode));
     }
 
     void onPeerConnected() {
@@ -279,9 +312,9 @@ public class CallActivity extends AppCompatActivity {
         Double soundLevelDouble = Double.parseDouble(soundLevel);
 
         if (soundLevelDouble < 0.01) {
-            currentUserEmoji.setText(getEmoji(emojiSmileClosed));
+            currentUserEmoji.setText(emojiSmileClosed);
         } else {
-            currentUserEmoji.setText(getEmoji(emojiSmileOpened));
+            currentUserEmoji.setText(emojiSmileOpened);
         }
     }
 
@@ -291,10 +324,34 @@ public class CallActivity extends AppCompatActivity {
         Double soundLevelDouble = Double.parseDouble(soundLevel);
 
         if (soundLevelDouble < 0.01) {
-            otherUserEmoji.setText(getEmoji(emojiSmileClosed));
+            otherUserEmoji.setText(emojiSmileClosed);
         } else {
-            otherUserEmoji.setText(getEmoji(emojiSmileOpened));
+            otherUserEmoji.setText(emojiSmileOpened);
         }
+    }
+
+    private void makeDialogInfo(String title, String description) {
+        // Create dialog from layout
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.dialog_info);
+        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
+
+        // Change the title
+        ((TextView) dialog.findViewById(R.id.dialog_info_title)).setText(title);
+
+        // Change description
+        ((TextView) dialog.findViewById(R.id.dialog_info_description)).setText(description);
+
+        // Show dialog
+        dialog.show();
+
+        dialog.findViewById(R.id.dialog_info_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Close dialog
+                dialog.dismiss();
+            }
+        });
     }
 
     private void startBackgroundAnimation() {

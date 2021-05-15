@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,11 +40,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 
 public class LoginActivity extends AppCompatActivity {
-
-    String[] permissions = {
-            Manifest.permission.RECORD_AUDIO
-    };
-    int requestCode = 1;
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
@@ -82,11 +78,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         startBackgroundAnimation();
-
-        // Check permissions
-        if (!isPermissionGranted()) {
-            askPermission();
-        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -140,21 +131,6 @@ public class LoginActivity extends AppCompatActivity {
             loginLinearLayout.setVisibility(View.VISIBLE);
             loginLinearLayout.startAnimation(AnimationUtils.loadAnimation(LoginActivity.this, R.anim.show_up));
         }
-    }
-
-    private void askPermission() {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
-    }
-
-    private boolean isPermissionGranted() {
-
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void startLoginLayoutListeners() {
@@ -223,6 +199,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
+                        userId = firebaseAuth.getCurrentUser().getUid();
                         switchToAnotherActivity(FirebaseAuth.getInstance().getCurrentUser());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -354,6 +331,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (task.getResult().exists()) {
                     // If he completed the registration go to the Main Activity
                     switchIntent = new Intent(LoginActivity.this, SearchActivity.class);
+                    loadCurrentUserDataFromDatabase();
                 } else {
                     // If he did not complete the registration go to the Register Activity
                     switchIntent = new Intent(LoginActivity.this, EditAccountActivity.class);
@@ -365,7 +343,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void loadDataAndStartIntent() {
-        loadCurrentUserDataFromDatabase();
+        loadInterestsFromDatabase();
     }
 
     private void loadCurrentUserDataFromDatabase() {
@@ -375,7 +353,6 @@ public class LoginActivity extends AppCompatActivity {
                 currentUserData = documentSnapshot.toObject(UserData.class);
 
                 switchIntent.putExtra("user_data", currentUserData);
-                loadInterestsFromDatabase();
             }
         });
     }

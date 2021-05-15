@@ -55,6 +55,7 @@
                 android:textColorHint="@color/grey"
                 android:textColor="@color/grey"
                 android:textSize="16dp"
+                android:ellipsize="end"
                 android:hint="Email"
                 android:id="@+id/login_email"/>
 
@@ -69,6 +70,7 @@
                 android:textColor="@color/grey"
                 android:textSize="16dp"
                 android:inputType="textPassword"
+                android:ellipsize="end"
                 android:hint="Password"
                 android:id="@+id/login_password"/>
 
@@ -134,6 +136,7 @@
                 android:textColorHint="@color/grey"
                 android:textColor="@color/grey"
                 android:textSize="16dp"
+                android:ellipsize="end"
                 android:hint="Email"
                 android:id="@+id/register_email"/>
 
@@ -148,6 +151,7 @@
                 android:textColor="@color/grey"
                 android:textSize="16dp"
                 android:inputType="textPassword"
+                android:ellipsize="end"
                 android:hint="Password"
                 android:id="@+id/register_password"/>
 
@@ -162,6 +166,7 @@
                 android:textColor="@color/grey"
                 android:textSize="16dp"
                 android:inputType="textPassword"
+                android:ellipsize="end"
                 android:hint="Confirm password"
                 android:id="@+id/register_password_confirm"/>
 

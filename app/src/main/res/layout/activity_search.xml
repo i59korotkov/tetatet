@@ -7,9 +7,42 @@
     tools:context=".SearchActivity"
     android:orientation="vertical"
     android:background="@drawable/gradient_list"
-    android:animateLayoutChanges="true"
     android:paddingTop="40dp"
     android:id="@+id/search_layout">
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/cancel_layout">
+
+        <ProgressBar
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="32dp"
+            android:background="@drawable/rounded_all_white_background"
+            android:backgroundTint="@color/white"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20dp"
+            android:textColor="@color/blue"
+            android:textAlignment="center"
+            android:text="Cancel"
+            android:id="@+id/cancel_btn"/>
+
+
+    </LinearLayout>
 
     <RelativeLayout
         android:visibility="visible"
@@ -25,7 +58,7 @@
             android:orientation="vertical"
             android:layout_marginTop="-40dp"
             android:background="@color/white2"
-            android:paddingTop="56dp"
+            android:paddingTop="48dp"
             android:paddingBottom="16dp"
             android:paddingHorizontal="48dp"
             android:animateLayoutChanges="true"
@@ -34,6 +67,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:fontFamily="sans-serif-medium"
                 android:textSize="20dp"
                 android:textColor="@color/grey"
