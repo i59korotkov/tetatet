@@ -20,6 +20,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,20 +36,16 @@ public class CallActivity extends AppCompatActivity {
 
     DatabaseReference firebaseRef;
 
-    String userId = "EtfAOpNqmcglBxNGy67Ce322pDn2";
-    String otherId = "pR2AcoZoIkar4nU4ZFB6neAbmmT2";
+    String currentUserId;
+    UserData currentUserData;
+    String otherUserId;
+    UserData otherUserData;
     String callId;
 
     // Call data
     boolean isPeerConnected = false;
 
     WebView webView;
-
-    String statusWaiting = "waiting";
-    String statusNormal = "normal";
-    String statusMuted = "muted";
-    String statusDisconnected = "disconnected";
-    String statusRejected = "rejected";
 
     // Current user
     TextView currentUserEmoji;
@@ -60,12 +57,20 @@ public class CallActivity extends AppCompatActivity {
     TextView otherUserEmoji;
     TextView otherUserText;
 
-    boolean isOtherUserMuted = false;
+    String otherUserStatus = "normal";
 
     // Emojis
     String emojiSmileClosed = "\uD83D\uDE42";
     String emojiSmileOpened = "\uD83D\uDE00";
     String emojiZipped = "\uD83E\uDD10";
+    String emojiDead = "\uD83D\uDE35";
+
+    // User status
+    final String statusWaiting = "waiting";
+    final String statusNormal = "normal";
+    final String statusMuted = "muted";
+    final String statusDisconnected = "disconnected";
+    final String statusRejected = "rejected";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +80,13 @@ public class CallActivity extends AppCompatActivity {
         startBackgroundAnimation();
 
         firebaseRef = FirebaseDatabase.getInstance().getReference("calls");
+
+        // Get data from intent
+        currentUserId = getIntent().getStringExtra("current_id");
+        currentUserData = (UserData) getIntent().getSerializableExtra("current_data");
+        otherUserId = getIntent().getStringExtra("other_id");
+        otherUserData = (UserData) getIntent().getSerializableExtra("other_data");
+        callId = getIntent().getStringExtra("call_id");
 
         webView = (WebView) findViewById(R.id.call_webview);
 
@@ -100,6 +112,15 @@ public class CallActivity extends AppCompatActivity {
             askPermission();
         }
 
+        setupWebView();
+
+        // Check if current user is caller
+        if (callId.equals(currentUserId)) {
+            answerCall();
+        } else {
+            startCall();
+        }
+
         currentUserEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -111,16 +132,16 @@ public class CallActivity extends AppCompatActivity {
                 isCurrentUserMuted = !isCurrentUserMuted;
 
                 if (isCurrentUserMuted) {
-                    firebaseRef.child(callId).child(userId).setValue(statusMuted);
+                    firebaseRef.child(callId).child(currentUserId).setValue(statusMuted);
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusMuted);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusMuted);
 
                     callJavascriptFunction("javascript:toggleAudio(\"" + !isCurrentUserMuted + "\")");
 
                     currentUserEmoji.setText(emojiZipped);
-                    currentUserText.setText("You (muted)");
+                    currentUserText.setText("You are muted");
                 } else {
-                    firebaseRef.child(callId).child(userId).setValue(statusNormal);
+                    firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusNormal);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusNormal);
 
@@ -132,16 +153,36 @@ public class CallActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.call_call_btn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendCallRequest(otherId);
-            }
-        });
-
-        setupWebView();
-
         startSoundCheckRunnable();
+    }
+
+    private void startCall() {
+        firebaseRef.child(callId).child(currentUserId).setValue(statusWaiting);
+        firebaseRef.child(callId).child(otherUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal)) {
+                    if (!isPeerConnected) {
+                        Toast.makeText(CallActivity.this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    callJavascriptFunction("javascript:startCall(\"" + otherUserId + "\")");
+                    firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+
+                    listenOtherUserStatus();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {}
+        });
+    }
+
+    private void answerCall() {
+        firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+
+        listenOtherUserStatus();
     }
 
     private void askPermission() {
@@ -209,51 +250,11 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void initializePeer() {
-        callJavascriptFunction("javascript:init(\"" + userId + "\")");
-        firebaseRef.child(userId).child("caller").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() == null) return;
-
-                callId = userId;
-                firebaseRef.child(callId).child(userId).setValue(statusNormal);
-
-                listenOtherUserStatus();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
-    }
-
-    private void sendCallRequest(String receiverId) {
-        if (!isPeerConnected) {
-            Toast.makeText(this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        firebaseRef.child(receiverId).child("caller").setValue(userId);
-        firebaseRef.child(receiverId).child(userId).setValue(statusWaiting);
-        firebaseRef.child(receiverId).child(receiverId).addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                // TODO: Check if call is already started
-                if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal) && callId == null) {
-                    callId = receiverId;
-                    firebaseRef.child(callId).child(userId).setValue(statusNormal);
-                    callJavascriptFunction("javascript:startCall(\"" + receiverId + "\")");
-
-                    listenOtherUserStatus();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
-        });
+        callJavascriptFunction("javascript:init(\"" + currentUserId + "\")");
     }
 
     private void listenOtherUserStatus() {
-        firebaseRef.child(callId).child(otherId).addValueEventListener(new ValueEventListener() {
+        firebaseRef.child(callId).child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() == null) return;
@@ -268,15 +269,20 @@ public class CallActivity extends AppCompatActivity {
 
     private void updateOtherUserStatus(String status) {
         switch (status) {
-            case "normal":
+            case statusNormal:
                 otherUserEmoji.setText(emojiSmileClosed);
-                otherUserText.setText("Name");
-                isOtherUserMuted = false;
+                otherUserText.setText(otherUserData.getName());
+                otherUserStatus = status;
                 break;
-            case "muted":
+            case statusMuted:
                 otherUserEmoji.setText(emojiZipped);
-                otherUserText.setText("Name (muted)");
-                isOtherUserMuted = true;
+                otherUserText.setText(otherUserData.getName() + " is muted");
+                otherUserStatus = status;
+                break;
+            case statusDisconnected:
+                otherUserEmoji.setText(emojiDead);
+                otherUserText.setText(otherUserData.getName() + " disconnected");
+                otherUserStatus = status;
                 break;
         }
     }
@@ -319,7 +325,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void changeOtherUserEmoji(String soundLevel) {
-        if (soundLevel.equals("null") || isOtherUserMuted) return;
+        if (soundLevel.equals("null") || !otherUserStatus.equals(statusNormal)) return;
 
         Double soundLevelDouble = Double.parseDouble(soundLevel);
 
@@ -361,5 +367,29 @@ public class CallActivity extends AppCompatActivity {
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(4000);
         animationDrawable.start();
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        firebaseRef.child(callId).child(otherUserId).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
+            @Override
+            public void onSuccess(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue().toString().equals(statusDisconnected)) {
+                    // Remove call from database
+                    firebaseRef.child(callId).removeValue();
+                } else {
+                    // Set current user status to disconnected
+                    firebaseRef.child(callId).child(currentUserId).setValue(statusDisconnected);
+                }
+            }
+        });
+        webView.loadUrl("about:blank");
+
+        super.onDestroy();
     }
 }

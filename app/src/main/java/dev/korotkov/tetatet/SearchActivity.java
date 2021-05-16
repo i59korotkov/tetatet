@@ -32,7 +32,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
-    DatabaseReference firebaseRef;
+    DatabaseReference firebaseSearchRef;
+    DatabaseReference firebaseCallRef;
 
     Boolean isBusy = false;
 
@@ -86,7 +87,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
-        firebaseRef = FirebaseDatabase.getInstance().getReference("search");
+        firebaseSearchRef = FirebaseDatabase.getInstance().getReference("search");
+        firebaseCallRef = FirebaseDatabase.getInstance().getReference("calls");
 
         // Get data from intent
         avatars = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("avatars");
@@ -150,6 +152,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 hideCurrentUserCard();
                 cancelLayout.setVisibility(View.VISIBLE);
 
+                isBusy = false;
+
                 startSearching();
                 break;
             case R.id.cancel_btn:
@@ -158,10 +162,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 cancelLayout.setVisibility(View.GONE);
 
                 // Stop listening for incoming offers
-                firebaseRef.child(currentUserId).child("status").setValue("stopped");
+                firebaseSearchRef.child(currentUserId).child("status").setValue("stopped");
 
                 // Remove user from database
-                firebaseRef.child(currentUserId).removeValue();
+                firebaseSearchRef.child(currentUserId).removeValue();
 
                 showCurrentUserCard();
 
@@ -172,14 +176,35 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 hideOtherUserCard();
 
                 // Remove offer from db
-                firebaseRef.child(currentUserId).child("offer").removeValue();
+                firebaseSearchRef.child(currentUserId).child("offer").removeValue();
 
                 startSearching();
 
                 isBusy = false;
                 break;
             case R.id.call_btn:
-                Toast.makeText(SearchActivity.this, "Call btn clicked", Toast.LENGTH_SHORT).show();
+                firebaseSearchRef.child(otherUserId).child("status").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.getValue() != null) {
+                            if (snapshot.getValue().toString().equals("accepted")) {
+                                startCallAsReceiver();
+                            } else {
+                                startCallAsCaller();
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) { }
+                });
+
+                // TODO: Add progress bar to btn
+
+                hideOtherUserCard();
+                showCurrentUserCard();
+
+                isBusy = true;
                 break;
             case R.id.edit_btn:
                 Intent intent = new Intent(SearchActivity.this, EditAccountActivity.class);
@@ -193,15 +218,65 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    private void startCallAsCaller() {
+        firebaseSearchRef.child(currentUserId).child("status").setValue("accepted");
+
+        firebaseCallRef.child(otherUserId).child("caller").setValue(currentUserId);
+
+        // Start activity only when call is accepted
+        firebaseSearchRef.child(otherUserId).child("status").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null && snapshot.getValue().toString().equals("accepted")) {
+                    Intent intent = new Intent(SearchActivity.this, CallActivity.class);
+                    intent.putExtra("current_id", currentUserId);
+                    intent.putExtra("other_id", otherUserId);
+                    intent.putExtra("current_data", currentUserData);
+                    intent.putExtra("other_data", otherUserData);
+                    intent.putExtra("call_id", otherUserId);
+                    startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
+    private void startCallAsReceiver() {
+        firebaseSearchRef.child(currentUserId).child("status").setValue("accepted");
+        // Start activity only when call is generated
+        firebaseCallRef.child(currentUserId).child(otherUserId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null && snapshot.getValue().equals("waiting")) {
+                    Intent intent = new Intent(SearchActivity.this, CallActivity.class);
+                    intent.putExtra("current_id", currentUserId);
+                    intent.putExtra("other_id", otherUserId);
+                    intent.putExtra("current_data", currentUserData);
+                    intent.putExtra("other_data", otherUserData);
+                    intent.putExtra("call_id", currentUserId);
+                    startActivity(intent);
+
+                    firebaseSearchRef.child(currentUserId).removeValue();
+                    firebaseSearchRef.child(otherUserId).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) { }
+        });
+    }
+
     private void startSearching() {
         // Add user to database
-        firebaseRef.child(currentUserId).child("status").setValue("searching");
+        firebaseSearchRef.child(currentUserId).child("status").setValue("searching");
 
         // Start listening for incoming offer
         listenForIncomingOffer();
 
         // Offer call to random user
-        firebaseRef.addValueEventListener(new ValueEventListener() {
+        firebaseSearchRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot == null || snapshot.getChildrenCount() <= 1 || isBusy) return;
@@ -213,15 +288,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     if (!user.getKey().equals(currentUserId)) searchingUsers.add(user.getKey());
                 }
 
-                String randomUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
+                otherUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
 
-                firebaseRef.child(randomUserId).child("offer").setValue(currentUserId);
-                firebaseRef.child(randomUserId).child("status").setValue("offered");
-
-                firebaseRef.child(currentUserId).child("status").setValue("accepted");
+                firebaseSearchRef.child(otherUserId).child("offer").setValue(currentUserId);
+                firebaseSearchRef.child(otherUserId).child("status").setValue("offered");
 
                 // Get other user data
-                firebaseFirestore.collection("users").document(randomUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                firebaseFirestore.collection("users").document(otherUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                     @Override
                     public void onSuccess(DocumentSnapshot documentSnapshot) {
                         setOtherUserCardData(documentSnapshot.toObject(UserData.class));
@@ -230,7 +303,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 });
 
-                firebaseRef.removeEventListener(this);
+                firebaseSearchRef.removeEventListener(this);
             }
 
             @Override
@@ -239,13 +312,11 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void listenForIncomingOffer() {
-        firebaseRef.child(currentUserId).child("offer").addValueEventListener(new ValueEventListener() {
+        firebaseSearchRef.child(currentUserId).child("offer").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() == null || snapshot.getValue().toString().equals("searching") || snapshot.getValue().toString().equals("stopped"))
                     return;
-
-                firebaseRef.child(currentUserId).child("status").setValue("accepted");
 
                 isBusy = true;
 
@@ -270,13 +341,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     public void onFailure(@NonNull Exception e) {
                         isBusy = false;
                         // Ignore incoming offer if error occurs
-                        firebaseRef.child(currentUserId).child("status").setValue("searching");
+                        firebaseSearchRef.child(currentUserId).child("status").setValue("searching");
                         listenForIncomingOffer();
                     }
                 });
 
                 // Remove listener
-                firebaseRef.child(currentUserId).child("offer").removeEventListener(this);
+                firebaseSearchRef.child(currentUserId).child("offer").removeEventListener(this);
             }
 
             @Override
@@ -400,7 +471,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     @Override
     protected void onDestroy() {
-        firebaseRef.child(currentUserId).removeValue();
+        firebaseSearchRef.child(currentUserId).removeValue();
 
         super.onDestroy();
     }

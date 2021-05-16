@@ -41,7 +41,6 @@
             android:text="Cancel"
             android:id="@+id/cancel_btn"/>
 
-
     </LinearLayout>
 
     <RelativeLayout
