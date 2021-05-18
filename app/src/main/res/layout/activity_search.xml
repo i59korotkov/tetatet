@@ -244,22 +244,35 @@
                     android:text="Skip"
                     android:id="@+id/skip_btn"/>
 
-                <TextView
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentRight="true"
-                    android:layout_marginLeft="16dp"
-                    android:paddingVertical="4dp"
-                    android:paddingHorizontal="16dp"
-                    android:background="@drawable/rounded_all_white_background"
-                    android:backgroundTint="@color/green"
-                    android:fontFamily="sans-serif-medium"
-                    android:textSize="20dp"
-                    android:textColor="@color/white"
-                    android:textAlignment="center"
-                    android:text="Call"
-                    android:id="@+id/call_btn"/>
+                    android:layout_marginLeft="16dp">
+
+                    <ProgressBar
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerInParent="true"
+                        android:indeterminateTint="@color/green"/>
+
+                    <TextView
+                        android:visibility="visible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingVertical="4dp"
+                        android:paddingHorizontal="16dp"
+                        android:background="@drawable/rounded_all_white_background"
+                        android:backgroundTint="@color/green"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="20dp"
+                        android:textColor="@color/white"
+                        android:textAlignment="center"
+                        android:text="Call"
+                        android:id="@+id/call_btn"/>
+
+                </RelativeLayout>
 
             </RelativeLayout>
 

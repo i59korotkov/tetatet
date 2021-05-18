@@ -44,6 +44,7 @@ public class CallActivity extends AppCompatActivity {
 
     // Call data
     boolean isPeerConnected = false;
+    boolean callStarted = false;
 
     WebView webView;
 
@@ -114,13 +115,6 @@ public class CallActivity extends AppCompatActivity {
 
         setupWebView();
 
-        // Check if current user is caller
-        if (callId.equals(currentUserId)) {
-            answerCall();
-        } else {
-            startCall();
-        }
-
         currentUserEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,13 +155,16 @@ public class CallActivity extends AppCompatActivity {
         firebaseRef.child(callId).child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal)) {
+                if (!callStarted && snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal)) {
                     if (!isPeerConnected) {
                         Toast.makeText(CallActivity.this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
                         return;
                     }
 
                     callJavascriptFunction("javascript:startCall(\"" + otherUserId + "\")");
+
+                    callStarted = true;
+
                     firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
 
                     listenOtherUserStatus();
@@ -251,6 +248,14 @@ public class CallActivity extends AppCompatActivity {
 
     private void initializePeer() {
         callJavascriptFunction("javascript:init(\"" + currentUserId + "\")");
+
+        // TODO: Maybe remove to another place?
+        // When peer is ready, check if current user is caller
+        if (callId.equals(currentUserId)) {
+            answerCall();
+        } else {
+            startCall();
+        }
     }
 
     private void listenOtherUserStatus() {

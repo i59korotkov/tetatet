@@ -13,9 +13,9 @@ var remoteLocalStreamSource = null;
 let peer
 function init(userId) {
     peer = new Peer(userId, {
-        host: '192.168.0.107',
-        port: 9000,
-        path: '/tetatet'
+        host: 'tetatet-server.herokuapp.com',
+        port: 443,
+        secure: true
     })
 
     peer.on('open', () => {
