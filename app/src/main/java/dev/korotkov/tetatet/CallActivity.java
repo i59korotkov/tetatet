@@ -42,6 +42,8 @@ public class CallActivity extends AppCompatActivity {
     UserData otherUserData;
     String callId;
 
+    TextView finishBtn;
+
     // Call data
     boolean isPeerConnected = false;
     boolean callStarted = false;
@@ -90,6 +92,8 @@ public class CallActivity extends AppCompatActivity {
         callId = getIntent().getStringExtra("call_id");
 
         webView = (WebView) findViewById(R.id.call_webview);
+
+        finishBtn = (TextView) findViewById(R.id.finish_btn);
 
         // Current user
         currentUserEmoji = (TextView) findViewById(R.id.call_current_user_emoji);
@@ -144,6 +148,13 @@ public class CallActivity extends AppCompatActivity {
                     currentUserEmoji.setText(emojiSmileClosed);
                     currentUserText.setText("You");
                 }
+            }
+        });
+
+        finishBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 

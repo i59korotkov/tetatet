@@ -16,8 +16,9 @@
         android:id="@+id/call_webview" />
 
     <RelativeLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
         android:padding="32dp"
         android:layout_centerInParent="true"
         android:background="@drawable/rounded_all_white_smaller_radius_background"
@@ -45,7 +46,7 @@
             android:id="@+id/call_current_user_text"/>
 
         <View
-            android:layout_width="256dp"
+            android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_below="@id/call_current_user_text"
             android:layout_marginVertical="16dp"
@@ -74,32 +75,22 @@
             android:text="Name"
             android:id="@+id/call_another_user_text"/>
 
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:visibility="gone"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/rounded_all_white_background"
-        android:elevation="64dp">
-
-        <Chronometer
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:textSize="32dp" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:textSize="64dp"
-            android:textColor="#ff000000"
-            android:text="👋" />
+            android:layout_below="@id/call_another_user_text"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="32dp"
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="32dp"
+            android:background="@drawable/rounded_all_white_background"
+            android:backgroundTint="@color/red"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20dp"
+            android:textColor="@color/white"
+            android:textAlignment="center"
+            android:text="Finish dialog"
+            android:id="@+id/finish_btn"/>
 
     </RelativeLayout>
 

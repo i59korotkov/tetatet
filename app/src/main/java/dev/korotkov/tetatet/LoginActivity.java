@@ -274,10 +274,9 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        Intent intent = new Intent(LoginActivity.this, EditAccountActivity.class);
-                        intent.putExtra("button_text", "Finish registration");
-                        startActivity(intent);
-                        finish();
+                        switchIntent = new Intent(LoginActivity.this, EditAccountActivity.class);
+                        switchIntent.putExtra("button_text", "Finish registration");
+                        switchToAnotherActivity(firebaseAuth.getCurrentUser());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override

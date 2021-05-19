@@ -41,8 +41,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     String otherUserId;
     UserData otherUserData;
 
-    String offerId;
-
     // Current user card views
     RelativeLayout currentUserCard;
     TextView currentAvatar;
@@ -161,13 +159,26 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 hideCurrentUserCard();
 
                 startSearching();
+
                 break;
             case R.id.cancel_btn:
+                stopSearching();
+                break;
             case R.id.stop_btn:
+                // Check if call exists and reject
+                firebaseCallRef.child(currentUserId).removeValue();
+                //firebaseCallRef.child(currentUserId).child(currentUserId).setValue(statusRejected);
+                firebaseCallRef.child(otherUserId).removeValue();
+
                 stopSearching();
                 break;
             case R.id.skip_btn:
                 hideOtherUserCard();
+
+                // Check if call exists and reject
+                firebaseCallRef.child(currentUserId).removeValue();
+                //firebaseCallRef.child(currentUserId).child(currentUserId).setValue(statusRejected);
+                firebaseCallRef.child(otherUserId).removeValue();
 
                 // Remove user from search list
                 firebaseSearchRef.child(currentUserId).removeValue();
@@ -218,7 +229,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() == null) return;
-                firebaseSearchRef.removeEventListener(this);
+                firebaseCallRef.child(otherUserId).child(otherUserId).removeEventListener(this);
 
                 if (snapshot.getValue().toString().equals(statusWaiting)) {
                     // Start call activity if user accepted offer
@@ -234,7 +245,10 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     hideOtherUserCard();
                     showCurrentUserCard();
                 } else if (snapshot.getValue().toString().equals(statusRejected)) {
-                    // Start searching again if user rejected offer
+                    // Remove call from database
+                    firebaseCallRef.child(otherUserId).removeValue();
+
+                    // Start searching again
                     hideOtherUserCard();
 
                     startSearching();
@@ -247,6 +261,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void startCallAsReceiver() {
+        // Hide call btn to show progress bar
+        callBtn.setVisibility(View.INVISIBLE);
+
         // Remove user from search list
         firebaseSearchRef.child(currentUserId).removeValue();
 
@@ -258,6 +275,8 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusWaiting)) {
+                    firebaseCallRef.child(currentUserId).child(otherUserId).removeEventListener(this);
+
                     // Start call activity when call is ready
                     Intent intent = new Intent(SearchActivity.this, CallActivity.class);
                     intent.putExtra("current_id", currentUserId);
@@ -267,7 +286,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     intent.putExtra("call_id", currentUserId);
                     startActivity(intent);
 
-                    firebaseCallRef.removeEventListener(this);
+                    // Show current user card
+                    hideOtherUserCard();
+                    showCurrentUserCard();
                 }
             }
 
@@ -296,14 +317,23 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                         ArrayList<String> searchingUsers = new ArrayList<>();
 
                         for (DataSnapshot user : snapshot.getChildren()) {
-                            if (!user.getKey().equals(currentUserId)) searchingUsers.add(user.getKey());
+                            ArrayList<String> commonLanguages = (ArrayList<String>) user.child("languages").getValue();
+                            commonLanguages.retainAll(currentUserData.getLanguagesIds());
+                            // If users have common languages
+                            if (commonLanguages.size() > 0)
+                                searchingUsers.add(user.getKey());
+                        }
+
+                        // If users not found start than add yourself to search list
+                        if (searchingUsers.size() == 0) {
+                            listenForIncomingOffer();
+                            return;
                         }
 
                         otherUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
-                        offerId = otherUserId;
 
-                        firebaseSearchRef.child(offerId).child("offer").setValue(currentUserId);
-                        firebaseSearchRef.child(offerId).child("status").setValue(statusOffered);
+                        firebaseSearchRef.child(otherUserId).child("offer").setValue(currentUserId);
+                        firebaseSearchRef.child(otherUserId).child("status").setValue(statusOffered);
 
                         // Get other user data and show his card
                         firebaseFirestore.collection("users").document(otherUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -342,6 +372,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     private void listenForIncomingOffer() {
         firebaseSearchRef.child(currentUserId).child("status").setValue(statusSearching);
+        firebaseSearchRef.child(currentUserId).child("languages").setValue(currentUserData.getLanguagesIds());
 
         firebaseSearchRef.child(currentUserId).child("offer").addValueEventListener(new ValueEventListener() {
             @Override
@@ -351,7 +382,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 firebaseSearchRef.child(currentUserId).child("offer").removeEventListener(this);
 
                 otherUserId = snapshot.getValue().toString();
-                offerId = currentUserId;
 
                 DocumentReference otherUserDocumentReference = firebaseFirestore.collection("users").document(otherUserId);
 
