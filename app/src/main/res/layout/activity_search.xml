@@ -10,6 +10,21 @@
     android:paddingTop="40dp"
     android:id="@+id/search_layout">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="32dp"
+        android:paddingVertical="4dp"
+        android:paddingHorizontal="32dp"
+        android:background="@drawable/rounded_all_white_background"
+        android:backgroundTint="@color/white"
+        android:fontFamily="sans-serif-medium"
+        android:textSize="20dp"
+        android:textColor="@color/blue"
+        android:textAlignment="center"
+        android:text="Logout"
+        android:id="@+id/logout_btn"/>
+
     <LinearLayout
         android:visibility="gone"
         android:layout_width="match_parent"

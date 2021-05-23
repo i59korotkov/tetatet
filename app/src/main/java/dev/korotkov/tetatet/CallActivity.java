@@ -6,10 +6,13 @@ import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
@@ -263,6 +266,10 @@ public class CallActivity extends AppCompatActivity {
                 otherUserStatus = status;
                 break;
             case statusDisconnected:
+                // Make vibration
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+
                 otherUserEmoji.setText(emojiDead);
                 otherUserText.setText(otherUserData.getName() + " disconnected");
                 otherUserStatus = status;

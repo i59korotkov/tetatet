@@ -7,10 +7,13 @@ import androidx.core.app.ActivityCompat;
 import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -48,6 +51,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     String otherUserId;
     UserData otherUserData;
+
+    // Logout button
+    TextView logoutBtn;
 
     // Current user card views
     RelativeLayout currentUserCard;
@@ -118,6 +124,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         currentUserId = firebaseAuth.getCurrentUser().getUid();
 
+        // Logout button
+        logoutBtn = findViewById(R.id.logout_btn);
+
         // Current user card views
         currentUserCard = findViewById(R.id.current_user_card);
         currentAvatar = findViewById(R.id.current_avatar);
@@ -163,6 +172,33 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         skipBtn.setOnClickListener(this);
         callBtn.setOnClickListener(this);
         cancelBtn.setOnClickListener(this);
+
+        // Logout
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeDialogInfo("Info", "You need to hold \"Logout\" button to logout");
+            }
+        });
+
+        logoutBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                // Logout user from Firebase Auth
+                firebaseAuth.signOut();
+
+                // Make vibration
+                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.EFFECT_HEAVY_CLICK));
+
+                // Switch to login activity
+                Intent intent = new Intent(SearchActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+
+                return false;
+            }
+        });
     }
 
     @Override
