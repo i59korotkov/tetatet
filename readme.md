@@ -27,10 +27,10 @@ APK файл для установки лежит по пути
 
 ## Скриншоты из приложения
 
-![Активность диалога](https://ibb.co/MkwSM0r)
-![Активность редактирования аккаунта](https://ibb.co/gRpJvVK)
-![Активность регистрации](https://ibb.co/SBVx51k)
-![Активность поиска](https://ibb.co/HNPVCkX)
+![Активность диалога](https://i.ibb.co/fd6F4wf/Call-Activity.jpg)
+![Активность редактирования аккаунта](https://i.ibb.co/LZW1Q57/Edit-Account-Info-Activity.jpg)
+![Активность регистрации](https://i.ibb.co/1TRn7pC/Login-Activity.jpg)
+![Активность поиска](https://i.ibb.co/vsdHhKD/Search-Activity.jpg)
 
 ## О проекте
 
