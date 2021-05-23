@@ -32,7 +32,10 @@ APK файл для установки лежит по пути
 ![Активность регистрации](https://i.ibb.co/1TRn7pC/Login-Activity.jpg)
 ![Активность поиска](https://i.ibb.co/vsdHhKD/Search-Activity.jpg)
 
+
+
 ## О проекте
 
 Работает с версии Android SDK 26 (Oreo)
+
 Используется Firebase API и библиотека PeerJS
