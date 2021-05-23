@@ -39,6 +39,7 @@
             android:layout_below="@id/call_current_user_emoji"
             android:layout_marginTop="16dp"
             android:layout_centerHorizontal="true"
+            android:textAlignment="center"
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/grey"
             android:textSize="32dp"
@@ -69,10 +70,11 @@
             android:layout_below="@id/call_another_user_emoji"
             android:layout_marginTop="16dp"
             android:layout_centerHorizontal="true"
+            android:textAlignment="center"
             android:fontFamily="sans-serif-medium"
             android:textColor="@color/grey"
             android:textSize="32dp"
-            android:text="Name"
+            android:text="Connecting..."
             android:id="@+id/call_another_user_text"/>
 
         <TextView

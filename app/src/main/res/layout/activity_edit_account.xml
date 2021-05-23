@@ -150,7 +150,7 @@
                 android:fontFamily="sans-serif-black"
                 android:textColor="@color/grey"
                 android:textSize="24dp"
-                android:text="About me" />
+                android:text="About you" />
 
             <EditText
                 android:layout_width="match_parent"

@@ -2,10 +2,13 @@ package dev.korotkov.tetatet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
@@ -29,6 +32,11 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
+
+    String[] permissions = {
+            Manifest.permission.RECORD_AUDIO
+    };
+    int requestCode = 1;
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
@@ -91,6 +99,11 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         setContentView(R.layout.activity_search);
 
         startBackgroundAnimation();
+
+        // Check permissions
+        if (!isPermissionGranted()) {
+            askPermission();
+        }
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
@@ -156,6 +169,12 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch(v.getId()){
             case R.id.start_btn:
+                // If permissions are not granted than reject search start and make dialog window
+                if (!isPermissionGranted()) {
+                    makeDialogInfo("Warning", "The app needs access to your microphone. You can provide it in the settings");
+                    return;
+                }
+
                 hideCurrentUserCard();
 
                 startSearching();
@@ -212,6 +231,22 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 startActivity(intent);
                 break;
         }
+    }
+
+    private void askPermission() {
+        ActivityCompat.requestPermissions(this, permissions, requestCode);
+
+    }
+
+    private boolean isPermissionGranted() {
+
+        for (String permission : permissions) {
+            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void startCallAsCaller() {
@@ -320,7 +355,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                             ArrayList<String> commonLanguages = (ArrayList<String>) user.child("languages").getValue();
                             commonLanguages.retainAll(currentUserData.getLanguagesIds());
                             // If users have common languages
-                            if (commonLanguages.size() > 0)
+                            if (commonLanguages.size() > 0 && user.child("status").getValue().toString().equals(statusSearching))
                                 searchingUsers.add(user.getKey());
                         }
 

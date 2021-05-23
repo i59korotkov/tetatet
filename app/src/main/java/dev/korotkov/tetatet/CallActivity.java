@@ -29,11 +29,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class CallActivity extends AppCompatActivity {
 
-    String[] permissions = {
-            Manifest.permission.RECORD_AUDIO
-    };
-    int requestCode = 1;
-
     DatabaseReference firebaseRef;
 
     String currentUserId;
@@ -54,7 +49,7 @@ public class CallActivity extends AppCompatActivity {
     TextView currentUserEmoji;
     TextView currentUserText;
 
-    boolean isCurrentUserMuted = false;
+    boolean currentUserMuted = false;
 
     // Other user
     TextView otherUserEmoji;
@@ -110,31 +105,19 @@ public class CallActivity extends AppCompatActivity {
         // Set volume controls to music
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        // Check permissions
-        if (!isPermissionGranted()) {
-            currentUserEmoji.setText(emojiZipped);
-            isCurrentUserMuted = true;
-            askPermission();
-        }
-
         setupWebView();
 
         currentUserEmoji.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isPermissionGranted()) {
-                    makeDialogInfo("Warning", "The app needs access to your microphone. You can provide it in the settings");
-                    return;
-                }
+                currentUserMuted = !currentUserMuted;
 
-                isCurrentUserMuted = !isCurrentUserMuted;
-
-                if (isCurrentUserMuted) {
+                if (currentUserMuted) {
                     firebaseRef.child(callId).child(currentUserId).setValue(statusMuted);
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusMuted);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusMuted);
 
-                    callJavascriptFunction("javascript:toggleAudio(\"" + !isCurrentUserMuted + "\")");
+                    callJavascriptFunction("javascript:toggleAudio(\"" + !currentUserMuted + "\")");
 
                     currentUserEmoji.setText(emojiZipped);
                     currentUserText.setText("You are muted");
@@ -143,7 +126,7 @@ public class CallActivity extends AppCompatActivity {
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusNormal);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusNormal);
 
-                    callJavascriptFunction("javascript:toggleAudio(\"" + !isCurrentUserMuted + "\")");
+                    callJavascriptFunction("javascript:toggleAudio(\"" + !currentUserMuted + "\")");
 
                     currentUserEmoji.setText(emojiSmileClosed);
                     currentUserText.setText("You");
@@ -191,22 +174,6 @@ public class CallActivity extends AppCompatActivity {
         firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
 
         listenOtherUserStatus();
-    }
-
-    private void askPermission() {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
-
-    }
-
-    private boolean isPermissionGranted() {
-
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void startSoundCheckRunnable() {
@@ -329,7 +296,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void changeCurrentUserEmoji(String soundLevel) {
-        if (soundLevel.equals("null") || isCurrentUserMuted) return;
+        if (soundLevel.equals("null") || currentUserMuted) return;
 
         Double soundLevelDouble = Double.parseDouble(soundLevel);
 
@@ -384,6 +351,40 @@ public class CallActivity extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(4000);
         animationDrawable.start();
     }
+
+    /*
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (!currentUserMuted) {
+            firebaseRef.child(callId).child(currentUserId).setValue(statusMuted);
+            //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusMuted);
+            //else firebaseRef.child(callId).child("callerStatus").setValue(statusMuted);
+
+            callJavascriptFunction("javascript:toggleAudio(\"" + !currentUserMuted + "\")");
+
+            currentUserEmoji.setText(emojiZipped);
+            currentUserText.setText("You are muted");
+        }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        if (!currentUserMuted) {
+            firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+            //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusNormal);
+            //else firebaseRef.child(callId).child("callerStatus").setValue(statusNormal);
+
+            callJavascriptFunction("javascript:toggleAudio(\"" + !currentUserMuted + "\")");
+
+            currentUserEmoji.setText(emojiSmileClosed);
+            currentUserText.setText("You");
+        }
+    }
+    */
 
     @Override
     public void onBackPressed() {
