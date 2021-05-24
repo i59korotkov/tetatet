@@ -154,7 +154,7 @@ public class CallActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (!callStarted && snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal)) {
                     if (!isPeerConnected) {
-                        Toast.makeText(CallActivity.this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
+                        //Toast.makeText(CallActivity.this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
                         return;
                     }
 
