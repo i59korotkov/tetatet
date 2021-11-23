@@ -410,4 +410,11 @@ public class CallActivity extends AppCompatActivity {
 
         super.onDestroy();
     }
+
+    @Override
+    public void finish() {
+        super.finish();
+        // Slide animation
+        overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
+    }
 }

@@ -2,16 +2,12 @@ package dev.korotkov.tetatet;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 
-import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -20,7 +16,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -274,7 +269,7 @@ public class LoginActivity extends AppCompatActivity {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnSuccessListener(new OnSuccessListener<AuthResult>() {
                     @Override
                     public void onSuccess(AuthResult authResult) {
-                        switchIntent = new Intent(LoginActivity.this, EditAccountActivity.class);
+                        switchIntent = new Intent(LoginActivity.this, RegisterActivity.class);
                         switchIntent.putExtra("button_text", "Finish registration");
                         switchToAnotherActivity(firebaseAuth.getCurrentUser());
                     }
@@ -329,11 +324,11 @@ public class LoginActivity extends AppCompatActivity {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.getResult().exists()) {
                     // If he completed the registration go to the Main Activity
-                    switchIntent = new Intent(LoginActivity.this, SearchActivity.class);
+                    switchIntent = new Intent(LoginActivity.this, MainActivity.class);
                     loadCurrentUserDataFromDatabase();
                 } else {
                     // If he did not complete the registration go to the Register Activity
-                    switchIntent = new Intent(LoginActivity.this, EditAccountActivity.class);
+                    switchIntent = new Intent(LoginActivity.this, RegisterActivity.class);
                     switchIntent.putExtra("button_text", "Finish registration");
                 }
                 loadDataAndStartIntent();

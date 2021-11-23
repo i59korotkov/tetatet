@@ -1,9 +1,5 @@
 package dev.korotkov.tetatet;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import android.Manifest;
 import android.animation.LayoutTransition;
 import android.app.Dialog;
@@ -12,9 +8,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,14 +33,10 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 
-public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
-
-    String[] permissions = {
-            Manifest.permission.RECORD_AUDIO
-    };
-    int requestCode = 1;
+public class SearchFragment extends Fragment implements View.OnClickListener {
 
     FirebaseAuth firebaseAuth;
     FirebaseFirestore firebaseFirestore;
@@ -63,7 +62,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     // Start controls
     RelativeLayout startControls;
-    TextView editBtn;
     TextView startBtn;
 
     // Other user card views
@@ -89,62 +87,55 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     ArrayList<ItemWithEmoji> languages = new ArrayList<>();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_search);
-
-        startBackgroundAnimation();
-
-        // Check permissions
-        if (!isPermissionGranted()) {
-            askPermission();
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseFirestore = FirebaseFirestore.getInstance();
         firebaseSearchRef = FirebaseDatabase.getInstance().getReference("search");
         firebaseCallRef = FirebaseDatabase.getInstance().getReference("calls");
 
-        // Get data from intent
-        avatars = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("avatars");
-        interests = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("interests");
-        languages = (ArrayList<ItemWithEmoji>) getIntent().getSerializableExtra("languages");
-        currentUserData = (UserData) getIntent().getSerializableExtra("user_data");
+        // Get data from bundle
+        avatars = (ArrayList<ItemWithEmoji>) getArguments().getSerializable("avatars");
+        interests = (ArrayList<ItemWithEmoji>) getArguments().getSerializable("interests");
+        languages = (ArrayList<ItemWithEmoji>) getArguments().getSerializable("languages");
+        currentUserData = (UserData) getArguments().getSerializable("user_data");
 
         currentUserId = firebaseAuth.getCurrentUser().getUid();
 
         // Logout button
-        logoutBtn = findViewById(R.id.logout_btn);
+        logoutBtn = view.findViewById(R.id.logout_btn);
 
         // Current user card views
-        currentUserCard = findViewById(R.id.current_user_card);
-        currentAvatar = findViewById(R.id.current_avatar);
-        currentMainInfo = findViewById(R.id.current_main_info);
-        currentLanguages = findViewById(R.id.current_languages);
-        currentInterests = findViewById(R.id.current_interests);
-        currentDescription = findViewById(R.id.current_description);
+        currentUserCard = view.findViewById(R.id.current_user_card);
+        currentAvatar = view.findViewById(R.id.current_avatar);
+        currentMainInfo = view.findViewById(R.id.current_main_info);
+        currentLanguages = view.findViewById(R.id.current_languages);
+        currentInterests = view.findViewById(R.id.current_interests);
+        currentDescription = view.findViewById(R.id.current_description);
 
         // Other user card views
-        otherUserCard = findViewById(R.id.other_user_card);
-        otherAvatar = findViewById(R.id.other_avatar);
-        otherMainInfo = findViewById(R.id.other_main_info);
-        otherLanguages = findViewById(R.id.other_languages);
-        otherInterests = findViewById(R.id.other_interests);
-        otherDescription = findViewById(R.id.other_description);
+        otherUserCard = view.findViewById(R.id.other_user_card);
+        otherAvatar = view.findViewById(R.id.other_avatar);
+        otherMainInfo = view.findViewById(R.id.other_main_info);
+        otherLanguages = view.findViewById(R.id.other_languages);
+        otherInterests = view.findViewById(R.id.other_interests);
+        otherDescription = view.findViewById(R.id.other_description);
 
         // Start controls
-        startControls = findViewById(R.id.start_controls);
-        editBtn = findViewById(R.id.edit_btn);
-        startBtn = findViewById(R.id.start_btn);
+        startControls = view.findViewById(R.id.start_controls);
+        startBtn = view.findViewById(R.id.start_btn);
 
         // Search controls
-        searchControls = findViewById(R.id.search_controls);
-        callBtn = findViewById(R.id.call_btn);
-        skipBtn = findViewById(R.id.skip_btn);
-        stopBtn = findViewById(R.id.stop_btn);
+        searchControls = view.findViewById(R.id.search_controls);
+        callBtn = view.findViewById(R.id.call_btn);
+        skipBtn = view.findViewById(R.id.skip_btn);
+        stopBtn = view.findViewById(R.id.stop_btn);
 
-        cancelLayout = findViewById(R.id.cancel_layout);
-        cancelBtn = findViewById(R.id.cancel_btn);
+        cancelLayout = view.findViewById(R.id.cancel_layout);
+        cancelBtn = view.findViewById(R.id.cancel_btn);
 
         // Set smooth transition
         currentUserCard.getLayoutTransition().enableTransitionType(LayoutTransition.CHANGING);
@@ -155,7 +146,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         hideOtherUserCard();
         otherUserCard.setVisibility(View.VISIBLE);
 
-        editBtn.setOnClickListener(this);
         startBtn.setOnClickListener(this);
         stopBtn.setOnClickListener(this);
         skipBtn.setOnClickListener(this);
@@ -177,18 +167,20 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 firebaseAuth.signOut();
 
                 // Make vibration
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+                Vibrator vibrator = (Vibrator) getActivity().getSystemService(Context.VIBRATOR_SERVICE);
                 vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.EFFECT_HEAVY_CLICK));
 
                 // Switch to login activity
-                Intent intent = new Intent(SearchActivity.this, LoginActivity.class);
+                Intent intent = new Intent(SearchFragment.this.getActivity(), LoginActivity.class);
                 startActivity(intent);
-                finish();
+                getActivity().finish();
 
                 return false;
             }
         });
 
+
+        return view;
     }
 
     @Override
@@ -196,7 +188,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         switch(v.getId()){
             case R.id.start_btn:
                 // If permissions are not granted than reject search start and make dialog window
-                if (!isPermissionGranted()) {
+                if (!((MainActivity) getActivity()).isPermissionGranted()) {
                     makeDialogInfo("Warning", "The app needs access to your microphone. You can provide it in the settings");
                     return;
                 }
@@ -247,36 +239,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 });
 
                 break;
-            case R.id.edit_btn:
-                Intent intent = new Intent(SearchActivity.this, RegisterActivity.class);
-                intent.putExtra("button_text", "Save changes");
-                intent.putExtra("avatars", avatars);
-                intent.putExtra("interests", interests);
-                intent.putExtra("languages", languages);
-                intent.putExtra("user_data", currentUserData);
-                startActivity(intent);
-                // Slide animation
-                overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
-                break;
         }
-    }
-
-
-
-    private void askPermission() {
-        ActivityCompat.requestPermissions(this, permissions, requestCode);
-
-    }
-
-    private boolean isPermissionGranted() {
-
-        for (String permission : permissions) {
-            if (ActivityCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private void startCallAsCaller() {
@@ -298,7 +261,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
                 if (snapshot.getValue().toString().equals(Status.WAITING.name())) {
                     // Start call activity if user accepted offer
-                    Intent intent = new Intent(SearchActivity.this, CallActivity.class);
+                    Intent intent = new Intent(SearchFragment.this.getActivity(), CallActivity.class);
                     intent.putExtra("current_id", currentUserId);
                     intent.putExtra("other_id", otherUserId);
                     intent.putExtra("current_data", currentUserData);
@@ -306,7 +269,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     intent.putExtra("call_id", otherUserId);
                     startActivity(intent);
                     // Slide animation
-                    overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
+                    getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
 
 
                     // Show current user card
@@ -346,7 +309,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     firebaseCallRef.child(currentUserId).child(otherUserId).removeEventListener(this);
 
                     // Start call activity when call is ready
-                    Intent intent = new Intent(SearchActivity.this, CallActivity.class);
+                    Intent intent = new Intent(SearchFragment.this.getActivity(), CallActivity.class);
                     intent.putExtra("current_id", currentUserId);
                     intent.putExtra("other_id", otherUserId);
                     intent.putExtra("current_data", currentUserData);
@@ -354,7 +317,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     intent.putExtra("call_id", currentUserId);
                     startActivity(intent);
                     // Slide animation
-                    overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
+                    getActivity().overridePendingTransition(R.anim.slide_in_top, R.anim.slide_out_bottom);
 
                     // Show current user card
                     hideOtherUserCard();
@@ -490,7 +453,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
         String commonInterests = "";
         for (ItemWithEmoji interest : interests) {
-            // TODO: Add common interests only
             if (userData.getInterestsIds().contains(interest.getId()) && currentUserData.getInterestsIds().contains(interest.getId())) commonInterests += " " + interest.getEmoji();
         }
 
@@ -535,7 +497,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         otherUserCard.animate().translationY(0).setDuration(500);
     }
 
-    private void setCurrentUserCardData() {
+    public void setCurrentUserCardData() {
         String userAvatar = "\uD83D\uDC64";
         for (ItemWithEmoji avatar : avatars) {
             if (currentUserData.getAvatarId().equals(avatar.getId())) userAvatar = avatar.getEmoji();
@@ -565,9 +527,9 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
 
     private void makeDialogInfo(String title, String description) {
         // Create dialog from layout
-        Dialog dialog = new Dialog(this);
+        Dialog dialog = new Dialog(getContext());
         dialog.setContentView(R.layout.dialog_info);
-        dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
+        dialog.getWindow().setBackgroundDrawable(getActivity().getDrawable(R.drawable.rounded_all_white_smaller_radius_background));
 
         // Change the title
         ((TextView) dialog.findViewById(R.id.dialog_info_title)).setText(title);
@@ -587,18 +549,4 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         });
     }
 
-    private void startBackgroundAnimation() {
-        RelativeLayout registerLayout = findViewById(R.id.search_layout);
-        AnimationDrawable animationDrawable = (AnimationDrawable) registerLayout.getBackground();
-        animationDrawable.setEnterFadeDuration(2000);
-        animationDrawable.setExitFadeDuration(4000);
-        animationDrawable.start();
-    }
-
-    @Override
-    protected void onDestroy() {
-        firebaseSearchRef.child(currentUserId).removeValue();
-
-        super.onDestroy();
-    }
 }

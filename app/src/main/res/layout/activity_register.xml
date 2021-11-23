@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RegisterActivity"
+    android:orientation="vertical"
+    android:background="@drawable/gradient_list"
+    android:scrollbars="none"
+    android:id="@+id/register_layout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="48dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_all_white_background">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/grey"
+                android:textSize="24dp"
+                android:text="Main information" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:id="@+id/register_name_layout">
+
+                <TextView
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textSize="16dp"
+                    android:text="Name"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_grey_stroke"
+                    android:textColorHint="@color/grey"
+                    android:textColor="@color/grey"
+                    android:textSize="16dp"
+                    android:hint="Your name"
+                    android:id="@+id/register_name"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:id="@+id/register_age_layout">
+
+                <TextView
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textSize="16dp"
+                    android:text="Age"/>
+
+                <EditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_grey_stroke"
+                    android:textColorHint="@color/grey"
+                    android:textColor="@color/grey"
+                    android:textSize="16dp"
+                    android:inputType="number"
+                    android:hint="Your age"
+                    android:id="@+id/register_age"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
+                android:id="@+id/register_avatar_layout">
+
+                <TextView
+                    android:layout_width="64dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    android:textSize="16dp"
+                    android:text="Avatar"/>
+
+                <TextView
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:textSize="24dp"
+                    android:textColor="#ff000000"
+                    android:id="@+id/register_avatar_emoji" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:paddingVertical="6dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_rectangle_grey_stroke"
+                    android:backgroundTint="@color/blue"
+                    android:textAlignment="center"
+                    android:textSize="16dp"
+                    android:textColor="@color/white"
+                    android:text="Choose avatar"
+                    android:id="@+id/register_avatar_btn"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginTop="32dp"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_all_white_background"
+            android:id="@+id/register_description_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/grey"
+                android:textSize="24dp"
+                android:text="About you" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:layout_marginTop="16dp"
+                android:padding="8dp"
+                android:background="@drawable/rounded_rectangle_grey_stroke"
+                android:textColorHint="@color/grey"
+                android:textColor="@color/grey"
+                android:textSize="16dp"
+                android:gravity="top"
+                android:hint="A few sentences about yourself (optional)"
+                android:id="@+id/register_description"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginTop="32dp"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_all_white_background"
+            android:id="@+id/register_interests_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/grey"
+                android:textSize="24dp"
+                android:text="Interests" />
+
+            <dev.korotkov.tetatet.NonScrollListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:listSelector="@android:color/transparent"
+                android:id="@+id/register_chosen_interests_list"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/rounded_rectangle_grey_stroke"
+                android:backgroundTint="@color/blue"
+                android:textAlignment="center"
+                android:textSize="16dp"
+                android:textColor="@color/white"
+                android:text="Choose your interests"
+                android:id="@+id/register_interests_btn"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="32dp"
+            android:layout_marginTop="32dp"
+            android:paddingHorizontal="32dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="32dp"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_all_white_background"
+            android:id="@+id/register_languages_layout">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-black"
+                android:textColor="@color/grey"
+                android:textSize="24dp"
+                android:text="Languages" />
+
+            <dev.korotkov.tetatet.NonScrollListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:listSelector="@android:color/transparent"
+                android:id="@+id/register_chosen_languages_list"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:paddingVertical="6dp"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/rounded_rectangle_grey_stroke"
+                android:backgroundTint="@color/blue"
+                android:textAlignment="center"
+                android:textSize="16dp"
+                android:textColor="@color/white"
+                android:text="Choose your languages"
+                android:id="@+id/register_languages_btn"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="64dp"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/rounded_top_white_background">
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:background="@drawable/rounded_grey_stroke"
+                    android:textSize="16dp"
+                    android:fontFamily="sans-serif-black"
+                    android:text="Finish registration"
+                    android:id="@+id/register_finish_btn"/>
+
+                <ProgressBar
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_centerInParent="true"
+                    android:indeterminateTint="@color/blue" />
+
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -15,13 +15,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Tetatet"
         android:usesCleartextTraffic="true">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
         <activity android:name=".SearchActivity"
             android:screenOrientation="portrait"/>
         <activity
             android:name=".CallActivity"
             android:screenOrientation="portrait"/>
         <activity
-            android:name=".EditAccountActivity"
+            android:name=".RegisterActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"

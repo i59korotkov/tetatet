@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SearchFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="32dp"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/cancel_layout">
+
+        <ProgressBar
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_horizontal"
+            android:indeterminateTint="@color/white"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:paddingVertical="4dp"
+            android:paddingHorizontal="32dp"
+            android:background="@drawable/rounded_all_white_background"
+            android:backgroundTint="@color/white"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="20dp"
+            android:textColor="@color/blue"
+            android:textAlignment="center"
+            android:text="Cancel"
+            android:id="@+id/cancel_btn"/>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:visibility="visible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:id="@+id/current_user_card">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_marginTop="-40dp"
+            android:background="@color/white2"
+            android:paddingTop="48dp"
+            android:paddingBottom="16dp"
+            android:paddingHorizontal="48dp"
+            android:animateLayoutChanges="true"
+            android:id="@+id/current_body">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20dp"
+                android:textColor="@color/grey"
+                android:text="Your interests: 🏀 🚀 🎮"
+                android:id="@+id/current_interests"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="20dp"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
+                android:id="@+id/current_description" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:animateLayoutChanges="true"
+                android:paddingHorizontal="8dp"
+                android:id="@+id/start_controls">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="6dp"
+                    android:layout_alignParentLeft="true"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:textSize="20dp"
+                    android:textColor="#ff000000"
+                    android:text="👋"
+                    android:id="@+id/logout_btn" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentRight="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="32dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/blue"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Find someone"
+                    android:id="@+id/start_btn"/>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_above="@id/current_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
+            android:layout_marginHorizontal="32dp"
+            android:padding="8dp"
+            android:layout_centerHorizontal="true"
+            android:animateLayoutChanges="true"
+            android:id="@+id/current_user_header">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="8dp"
+                android:textSize="64dp"
+                android:textColor="#ff000000"
+                android:text="👩‍🔧"
+                android:id="@+id/current_avatar" />
+
+            <TextView
+                android:layout_toEndOf="@id/current_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/grey"
+                android:textSize="32dp"
+                android:text="Julia, 23"
+                android:id="@+id/current_main_info"/>
+
+            <TextView
+                android:layout_toEndOf="@id/current_avatar"
+                android:layout_below="@id/current_main_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#ff000000"
+                android:textSize="24dp"
+                android:text="🇬🇧 🇷🇺"
+                android:id="@+id/current_languages"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:id="@+id/other_user_card">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:layout_marginTop="-40dp"
+            android:background="@color/white2"
+            android:paddingTop="56dp"
+            android:paddingBottom="16dp"
+            android:paddingHorizontal="48dp"
+            android:animateLayoutChanges="true"
+            android:id="@+id/other_body">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textSize="20dp"
+                android:textColor="@color/grey"
+                android:text="Common interests: 🏀 🚀 🎮"
+                android:id="@+id/other_interests"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:textSize="20dp"
+                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus mauris orci, feugiat eu aliquet vel, sollicitudin mattis augue. In a velit odio. Sed rutrum suscipit leo, nec accumsan lacus placerat id."
+                android:id="@+id/other_description" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal"
+                android:animateLayoutChanges="true"
+                android:paddingHorizontal="8dp"
+                android:id="@+id/search_controls">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_alignParentLeft="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/red"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Stop"
+                    android:id="@+id/stop_btn"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:paddingVertical="4dp"
+                    android:paddingHorizontal="16dp"
+                    android:background="@drawable/rounded_all_white_background"
+                    android:backgroundTint="@color/blue"
+                    android:fontFamily="sans-serif-medium"
+                    android:textSize="20dp"
+                    android:textColor="@color/white"
+                    android:textAlignment="center"
+                    android:text="Skip"
+                    android:id="@+id/skip_btn"/>
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="16dp">
+
+                    <ProgressBar
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_centerInParent="true"
+                        android:indeterminateTint="@color/green"/>
+
+                    <TextView
+                        android:visibility="visible"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:paddingVertical="4dp"
+                        android:paddingHorizontal="16dp"
+                        android:background="@drawable/rounded_all_white_background"
+                        android:backgroundTint="@color/green"
+                        android:fontFamily="sans-serif-medium"
+                        android:textSize="20dp"
+                        android:textColor="@color/white"
+                        android:textAlignment="center"
+                        android:text="Call"
+                        android:id="@+id/call_btn"/>
+
+                </RelativeLayout>
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_above="@id/other_body"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
+            android:layout_marginHorizontal="32dp"
+            android:padding="8dp"
+            android:layout_centerHorizontal="true"
+            android:animateLayoutChanges="true"
+            android:id="@+id/other_header">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginRight="8dp"
+                android:textSize="64dp"
+                android:textColor="#ff000000"
+                android:text="👩‍🔧"
+                android:id="@+id/other_avatar" />
+
+            <TextView
+                android:layout_toEndOf="@id/other_avatar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-medium"
+                android:textColor="@color/grey"
+                android:textSize="32dp"
+                android:text="Julia, 23"
+                android:id="@+id/other_main_info"/>
+
+            <TextView
+                android:layout_toEndOf="@id/other_avatar"
+                android:layout_below="@id/other_main_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="#ff000000"
+                android:textSize="24dp"
+                android:text="🇬🇧 🇷🇺"
+                android:id="@+id/other_languages"/>
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+</RelativeLayout>
