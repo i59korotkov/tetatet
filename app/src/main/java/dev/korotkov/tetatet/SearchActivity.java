@@ -31,7 +31,6 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 
 public class SearchActivity extends AppCompatActivity implements View.OnClickListener {
@@ -89,15 +88,6 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     ArrayList<ItemWithEmoji> avatars = new ArrayList<>();
     ArrayList<ItemWithEmoji> interests = new ArrayList<>();
     ArrayList<ItemWithEmoji> languages = new ArrayList<>();
-
-    // User status
-    final String statusWaiting = "waiting";
-    final String statusNormal = "normal";
-    final String statusMuted = "muted";
-    final String statusDisconnected = "disconnected";
-    final String statusRejected = "rejected";
-    final String statusSearching = "searching";
-    final String statusOffered = "offered";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -302,7 +292,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                 if (snapshot.getValue() == null) return;
                 firebaseCallRef.child(otherUserId).child(otherUserId).removeEventListener(this);
 
-                if (snapshot.getValue().toString().equals(statusWaiting)) {
+                if (snapshot.getValue().toString().equals(Status.WAITING.name())) {
                     // Start call activity if user accepted offer
                     Intent intent = new Intent(SearchActivity.this, CallActivity.class);
                     intent.putExtra("current_id", currentUserId);
@@ -315,7 +305,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     // Show current user card
                     hideOtherUserCard();
                     showCurrentUserCard();
-                } else if (snapshot.getValue().toString().equals(statusRejected)) {
+                } else if (snapshot.getValue().toString().equals(Status.REJECTED.name())) {
                     // Remove call from database
                     firebaseCallRef.child(otherUserId).removeValue();
 
@@ -339,13 +329,13 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
         firebaseSearchRef.child(currentUserId).removeValue();
 
         // Notify caller that we are ready to receive call
-        firebaseCallRef.child(currentUserId).child(currentUserId).setValue(statusWaiting);
+        firebaseCallRef.child(currentUserId).child(currentUserId).setValue(Status.WAITING);
 
         // Start activity only when call is generated
         firebaseCallRef.child(currentUserId).child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null && snapshot.getValue().toString().equals(statusWaiting)) {
+                if (snapshot.getValue() != null && snapshot.getValue().toString().equals(Status.WAITING.name())) {
                     firebaseCallRef.child(currentUserId).child(otherUserId).removeEventListener(this);
 
                     // Start call activity when call is ready
@@ -391,7 +381,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                             ArrayList<String> commonLanguages = (ArrayList<String>) user.child("languages").getValue();
                             commonLanguages.retainAll(currentUserData.getLanguagesIds());
                             // If users have common languages
-                            if (commonLanguages.size() > 0 && user.child("status").getValue().toString().equals(statusSearching))
+                            if (commonLanguages.size() > 0 && user.child("status").getValue().toString().equals(Status.SEARCHING.name()))
                                 searchingUsers.add(user.getKey());
                         }
 
@@ -404,7 +394,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                         otherUserId = searchingUsers.get((int) Math.random() * searchingUsers.size());
 
                         firebaseSearchRef.child(otherUserId).child("offer").setValue(currentUserId);
-                        firebaseSearchRef.child(otherUserId).child("status").setValue(statusOffered);
+                        firebaseSearchRef.child(otherUserId).child("status").setValue(Status.OFFERED);
 
                         // Get other user data and show his card
                         firebaseFirestore.collection("users").document(otherUserId).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
@@ -442,7 +432,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void listenForIncomingOffer() {
-        firebaseSearchRef.child(currentUserId).child("status").setValue(statusSearching);
+        firebaseSearchRef.child(currentUserId).child("status").setValue(Status.SEARCHING);
         firebaseSearchRef.child(currentUserId).child("languages").setValue(currentUserData.getLanguagesIds());
 
         firebaseSearchRef.child(currentUserId).child("offer").addValueEventListener(new ValueEventListener() {
@@ -473,7 +463,7 @@ public class SearchActivity extends AppCompatActivity implements View.OnClickLis
                     public void onFailure(@NonNull Exception e) {
                         // Ignore incoming offer if error occurs
                         firebaseSearchRef.child(currentUserId).child("offer").removeValue();
-                        firebaseSearchRef.child(currentUserId).child("status").setValue(statusSearching);
+                        firebaseSearchRef.child(currentUserId).child("status").setValue(Status.SEARCHING);
                     }
                 });
             }

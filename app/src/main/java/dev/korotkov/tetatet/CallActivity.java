@@ -58,20 +58,13 @@ public class CallActivity extends AppCompatActivity {
     TextView otherUserEmoji;
     TextView otherUserText;
 
-    String otherUserStatus = "normal";
+    String otherUserStatus = Status.NORMAL.name();
 
     // Emojis
     String emojiSmileClosed = "\uD83D\uDE42";
     String emojiSmileOpened = "\uD83D\uDE00";
     String emojiZipped = "\uD83E\uDD10";
     String emojiDead = "\uD83D\uDE35";
-
-    // User status
-    final String statusWaiting = "waiting";
-    final String statusNormal = "normal";
-    final String statusMuted = "muted";
-    final String statusDisconnected = "disconnected";
-    final String statusRejected = "rejected";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +109,7 @@ public class CallActivity extends AppCompatActivity {
                 currentUserMuted = !currentUserMuted;
 
                 if (currentUserMuted) {
-                    firebaseRef.child(callId).child(currentUserId).setValue(statusMuted);
+                    firebaseRef.child(callId).child(currentUserId).setValue(Status.MUTED);
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusMuted);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusMuted);
 
@@ -125,7 +118,7 @@ public class CallActivity extends AppCompatActivity {
                     currentUserEmoji.setText(emojiZipped);
                     currentUserText.setText("You are muted");
                 } else {
-                    firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+                    firebaseRef.child(callId).child(currentUserId).setValue(Status.NORMAL);
                     //if (callId.equals(userId)) firebaseRef.child(callId).child("receiverStatus").setValue(statusNormal);
                     //else firebaseRef.child(callId).child("callerStatus").setValue(statusNormal);
 
@@ -148,11 +141,11 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void startCall() {
-        firebaseRef.child(callId).child(currentUserId).setValue(statusWaiting);
+        firebaseRef.child(callId).child(currentUserId).setValue(Status.WAITING);
         firebaseRef.child(callId).child(otherUserId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!callStarted && snapshot.getValue() != null && snapshot.getValue().toString().equals(statusNormal)) {
+                if (!callStarted && snapshot.getValue() != null && snapshot.getValue().toString().equals(Status.NORMAL.name())) {
                     if (!isPeerConnected) {
                         //Toast.makeText(CallActivity.this, "You are not connected. Check your internet", Toast.LENGTH_LONG).show();
                         return;
@@ -162,7 +155,7 @@ public class CallActivity extends AppCompatActivity {
 
                     callStarted = true;
 
-                    firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+                    firebaseRef.child(callId).child(currentUserId).setValue(Status.NORMAL);
 
                     listenOtherUserStatus();
                 }
@@ -174,7 +167,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void answerCall() {
-        firebaseRef.child(callId).child(currentUserId).setValue(statusNormal);
+        firebaseRef.child(callId).child(currentUserId).setValue(Status.NORMAL);
 
         listenOtherUserStatus();
     }
@@ -254,26 +247,27 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void updateOtherUserStatus(String status) {
-        switch (status) {
-            case statusNormal:
-                otherUserEmoji.setText(emojiSmileClosed);
-                otherUserText.setText(otherUserData.getName());
-                otherUserStatus = status;
-                break;
-            case statusMuted:
-                otherUserEmoji.setText(emojiZipped);
-                otherUserText.setText(otherUserData.getName() + " is muted");
-                otherUserStatus = status;
-                break;
-            case statusDisconnected:
-                // Make vibration
-                Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-                vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
+        if (status.equals(Status.NORMAL.name()))
+        {
+            otherUserEmoji.setText(emojiSmileClosed);
+            otherUserText.setText(otherUserData.getName());
+            otherUserStatus = status;
+        }
+        else if (status.equals(Status.MUTED.name()))
+        {
+            otherUserEmoji.setText(emojiZipped);
+            otherUserText.setText(otherUserData.getName() + " is muted");
+            otherUserStatus = status;
+        }
+        else if (status.equals(Status.DISCONNECTED.name()))
+        {
+            // Make vibration
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE));
 
-                otherUserEmoji.setText(emojiDead);
-                otherUserText.setText(otherUserData.getName() + " disconnected");
-                otherUserStatus = status;
-                break;
+            otherUserEmoji.setText(emojiDead);
+            otherUserText.setText(otherUserData.getName() + " disconnected");
+            otherUserStatus = status;
         }
     }
 
@@ -315,7 +309,7 @@ public class CallActivity extends AppCompatActivity {
     }
 
     private void changeOtherUserEmoji(String soundLevel) {
-        if (soundLevel.equals("null") || !otherUserStatus.equals(statusNormal)) return;
+        if (soundLevel.equals("null") || !otherUserStatus.equals(Status.NORMAL.name())) return;
 
         Double soundLevelDouble = Double.parseDouble(soundLevel);
 
@@ -403,12 +397,12 @@ public class CallActivity extends AppCompatActivity {
         firebaseRef.child(callId).child(otherUserId).get().addOnSuccessListener(new OnSuccessListener<DataSnapshot>() {
             @Override
             public void onSuccess(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue().toString().equals(statusDisconnected)) {
+                if (dataSnapshot.getValue().toString().equals(Status.DISCONNECTED.name())) {
                     // Remove call from database
                     firebaseRef.child(callId).removeValue();
                 } else {
                     // Set current user status to disconnected
-                    firebaseRef.child(callId).child(currentUserId).setValue(statusDisconnected);
+                    firebaseRef.child(callId).child(currentUserId).setValue(Status.DISCONNECTED);
                 }
             }
         });
