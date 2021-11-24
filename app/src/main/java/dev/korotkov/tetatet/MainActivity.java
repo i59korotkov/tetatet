@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -80,20 +81,24 @@ public class MainActivity extends AppCompatActivity {
         bundle.putSerializable("user_data", currentUserData);
 
         viewPager = findViewById(R.id.viewpager);
+        viewPager.setPageTransformer(new MarginPageTransformer(convertDpToPx(16)));
         //viewPager.setOffscreenPageLimit(3);
 
         ViewPagerAdapter adapter = new ViewPagerAdapter(this);
-
-        // Add Search fragment
-        searchFragment.setArguments(bundle);
-        adapter.addFragment(searchFragment);
 
         // Add EditAccount fragment
         editAccountFragment.setArguments(bundle);
         adapter.addFragment(editAccountFragment);
 
+        // Add Search fragment
+        searchFragment.setArguments(bundle);
+        adapter.addFragment(searchFragment);
+
         // Set fragment adapter for view pager
         viewPager.setAdapter(adapter);
+
+        // Set default fragment as search fragment
+        viewPager.setCurrentItem(1, false);
     }
 
     private void askPermission() {
@@ -133,6 +138,10 @@ public class MainActivity extends AppCompatActivity {
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(4000);
         animationDrawable.start();
+    }
+
+    public int convertDpToPx(float dp) {
+        return Math.round(dp * this.getResources().getDisplayMetrics().density);
     }
 
     @Override

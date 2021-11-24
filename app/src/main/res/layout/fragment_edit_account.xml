@@ -17,11 +17,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
-            android:paddingHorizontal="32dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="32dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="24dp"
             android:orientation="vertical"
-            android:background="@drawable/rounded_all_white_background">
+            android:background="@drawable/rounded_all_white_smaller_radius_background">
 
             <TextView
                 android:layout_width="match_parent"
@@ -117,7 +116,7 @@
                     android:layout_marginBottom="4dp"
                     android:paddingVertical="6dp"
                     android:paddingHorizontal="16dp"
-                    android:background="@drawable/rounded_rectangle_grey_stroke"
+                    android:background="@drawable/rounded_grey_stroke"
                     android:backgroundTint="@color/blue"
                     android:textAlignment="center"
                     android:textSize="16dp"
@@ -134,11 +133,11 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
             android:layout_marginTop="32dp"
-            android:paddingHorizontal="32dp"
             android:paddingTop="16dp"
-            android:paddingBottom="32dp"
+            android:paddingBottom="24dp"
+            android:paddingHorizontal="24dp"
             android:orientation="vertical"
-            android:background="@drawable/rounded_all_white_background"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
             android:id="@+id/register_description_layout">
 
             <TextView
@@ -169,11 +168,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
             android:layout_marginTop="32dp"
-            android:paddingHorizontal="32dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="32dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="24dp"
             android:orientation="vertical"
-            android:background="@drawable/rounded_all_white_background"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
             android:id="@+id/register_interests_layout">
 
             <TextView
@@ -197,7 +195,7 @@
                 android:layout_marginTop="16dp"
                 android:paddingVertical="6dp"
                 android:paddingHorizontal="16dp"
-                android:background="@drawable/rounded_rectangle_grey_stroke"
+                android:background="@drawable/rounded_grey_stroke"
                 android:backgroundTint="@color/blue"
                 android:textAlignment="center"
                 android:textSize="16dp"
@@ -212,11 +210,10 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="32dp"
             android:layout_marginTop="32dp"
-            android:paddingHorizontal="32dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="32dp"
+            android:paddingVertical="16dp"
+            android:paddingHorizontal="24dp"
             android:orientation="vertical"
-            android:background="@drawable/rounded_all_white_background"
+            android:background="@drawable/rounded_all_white_smaller_radius_background"
             android:id="@+id/register_languages_layout">
 
             <TextView
@@ -240,7 +237,7 @@
                 android:layout_marginTop="16dp"
                 android:paddingVertical="6dp"
                 android:paddingHorizontal="16dp"
-                android:background="@drawable/rounded_rectangle_grey_stroke"
+                android:background="@drawable/rounded_grey_stroke"
                 android:backgroundTint="@color/blue"
                 android:textAlignment="center"
                 android:textSize="16dp"

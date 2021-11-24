@@ -399,6 +399,7 @@ public class LoginActivity extends AppCompatActivity {
                     // Switch activities after all data is loaded
                     switchIntent.putExtra("avatars", avatars);
                     startActivity(switchIntent);
+                    overridePendingTransition(R.anim.slide_in_bottom, R.anim.slide_out_top);
                     finish();
                 } else {
                     makeDialogInfo("Error", "Cannot get languages list from database");

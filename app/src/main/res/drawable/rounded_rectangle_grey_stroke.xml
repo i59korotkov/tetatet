@@ -6,9 +6,6 @@
         android:color="@color/grey">
     </stroke>
     <corners
-        android:topLeftRadius="16dp"
-        android:topRightRadius="16dp"
-        android:bottomLeftRadius="16dp"
-        android:bottomRightRadius="16dp">
+        android:radius="8dp">
     </corners>
 </shape>

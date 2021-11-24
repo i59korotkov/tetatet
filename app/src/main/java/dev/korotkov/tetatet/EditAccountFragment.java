@@ -240,7 +240,7 @@ public class EditAccountFragment extends Fragment {
                     @Override
                     public void onSuccess(Void aVoid) {
                         ((MainActivity) getActivity()).updateCurrentUserCardData();
-                        ((MainActivity) getActivity()).changeFragment(-1);
+                        ((MainActivity) getActivity()).changeFragment(1);
                         saveChangesBtn.setVisibility(View.VISIBLE);
                     }
                 }).addOnFailureListener(new OnFailureListener() {

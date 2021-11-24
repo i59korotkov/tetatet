@@ -240,6 +240,7 @@ public class RegisterActivity extends AppCompatActivity {
                         intent.putExtra("languages", languages);
                         intent.putExtra("user_data", currentUserData);
                         startActivity(intent);
+                        overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                         finish();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -360,12 +361,5 @@ public class RegisterActivity extends AppCompatActivity {
         animationDrawable.setEnterFadeDuration(2000);
         animationDrawable.setExitFadeDuration(4000);
         animationDrawable.start();
-    }
-
-    @Override
-    public void finish() {
-        super.finish();
-        // Slide animation
-        overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
     }
 }
