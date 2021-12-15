@@ -156,7 +156,7 @@ public class SearchFragment extends Fragment implements View.OnClickListener {
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                makeDialogInfo("Info", "You need to hold \"Logout\" button to logout");
+                makeDialogInfo("Info", "You need to hold button to logout");
             }
         });
 

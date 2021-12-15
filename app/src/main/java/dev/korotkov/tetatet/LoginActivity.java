@@ -270,7 +270,6 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(AuthResult authResult) {
                         switchIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                        switchIntent.putExtra("button_text", "Finish registration");
                         switchToAnotherActivity(firebaseAuth.getCurrentUser());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -329,7 +328,6 @@ public class LoginActivity extends AppCompatActivity {
                 } else {
                     // If he did not complete the registration go to the Register Activity
                     switchIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                    switchIntent.putExtra("button_text", "Finish registration");
                 }
                 loadDataAndStartIntent();
             }

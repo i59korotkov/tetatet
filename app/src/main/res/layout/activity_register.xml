@@ -56,6 +56,8 @@
                     android:textColorHint="@color/grey"
                     android:textColor="@color/grey"
                     android:textSize="16dp"
+                    android:maxLines="1"
+                    android:inputType="text"
                     android:hint="Your name"
                     android:id="@+id/register_name"/>
 
@@ -84,6 +86,7 @@
                     android:textColorHint="@color/grey"
                     android:textColor="@color/grey"
                     android:textSize="16dp"
+                    android:maxLines="1"
                     android:inputType="number"
                     android:hint="Your age"
                     android:id="@+id/register_age"/>
@@ -160,6 +163,7 @@
                 android:textColorHint="@color/grey"
                 android:textColor="@color/grey"
                 android:textSize="16dp"
+                android:maxLength="200"
                 android:gravity="top"
                 android:hint="A few sentences about yourself (optional)"
                 android:id="@+id/register_description"/>
